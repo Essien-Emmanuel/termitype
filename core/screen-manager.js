@@ -1,10 +1,10 @@
-import TitleScreen from "../screens/title-screen.js";
-import PrologueScreen from "../screens/prologue-screen.js";
-import GameScreen from "../screens/game-screen.js";
-import GameOverScreen from "../screens/game-over-screen.js";
-import GameTieScreen from "../screens/game-over-screen.js";
-import VictoryScreen from "../screens/victory-screen.js";
-import { initInput, writeLine } from "./io.js";
+import TitleScreen from "../screens/title.js";
+import PrologueScreen from "../screens/prologue.js";
+import GameScreen from "../screens/game.js";
+import GameOverScreen from "../screens/game-over.js";
+import GameTieScreen from "../screens/game-tie.js";
+import VictoryScreen from "../screens/victory.js";
+import MenuScreen from "../screens/menu.js";
 
 export default class ScreenManager {
   _setScreen(screen) {
@@ -12,10 +12,17 @@ export default class ScreenManager {
     this.activeScreen = screen;
     screen.handleKeyPress(this);
   }
+
+  loadMenuScreen() {
+    const screen = new MenuScreen();
+    this._setScreen(screen);
+  }
+
   loadTitleScreen() {
     const screen = new TitleScreen();
     this._setScreen(screen);
   }
+
   loadPrologueScreen() {
     const screen = new PrologueScreen();
     this._setScreen(screen);
@@ -30,10 +37,12 @@ export default class ScreenManager {
     const screen = new GameOverScreen();
     this._setScreen(screen);
   }
+
   loadGameTieScreen() {
     const screen = new GameTieScreen();
     this._setScreen(screen);
   }
+
   loadVictoryScreen() {
     const screen = new VictoryScreen();
     this._setScreen(screen);

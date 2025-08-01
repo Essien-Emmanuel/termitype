@@ -7,12 +7,14 @@ export default class PrologueScreen {
   }
 
   handleKeyPress(screenMgr) {
-    initInput(function (key) {
-     // const key = $key.trim().toLowerCase();
+    initInput({
+      prompt: "Press ENTER To continue",
 
-      if (key === "\r") {
-        screenMgr.loadGameScreen();
-      }
+      onKeyPress: function (key) {
+        if (key === "\r") {
+          screenMgr.loadMenuScreen();
+        }
+      },
     });
   }
 }

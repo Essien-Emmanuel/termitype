@@ -1,54 +1,50 @@
-import readline from "readline";
-
-let globalInterface = null;
-let currentOnKeyPress = null;
+import { stdin, stdout, exit as processExit } from "node:process";
 
 export function clearScreen() {
-  process.stdout.write("\x1B[2J\x1B[0;0H");
+  stdout.write("\x1B[2J\x1B[0;0H");
 }
 
 export function write(text = "") {
-  process.stdout.write(text);
+  stdout.write(text);
 }
 
 export function writeLine(text = "") {
   write(text + "\n");
 }
 
-export function initInput(onkeyPressFn) {
-  process.stdin.removeAllListeners("data");
-  currentOnKeyPress = onkeyPressFn;
-  process.stdin.setRawMode(true);
-  process.stdin.setEncoding("utf8");
-  process.stdin.resume();
-  process.stdin.on("data", key => {
+export function exit(message = null) {
+  if (message) writeLine(message);
+  stdin.removeAllListeners();
+  processExit();
+}
+
+export function initInput({ prompt = "", onKeyPress }) {
+  stdin.removeAllListeners("data");
+
+  if (prompt) writeLine(prompt);
+
+  stdin.setRawMode(true);
+  stdin.setEncoding("utf8");
+  stdin.resume();
+
+  stdin.on("data", (key) => {
     if (key === "\u0003") {
-      process.exit();
+      exit();
     }
-    if (currentOnKeyPress) currentOnKeyPress(key);
+    if (onKeyPress) {
+      onKeyPress(key);
+    }
   });
 }
 
-export function promptInput(onInputFn) {
-  if (globalInterface) {
-    globalInterface.close();
-    globalInterface = nullq;
-  }
-  process.stdin.setRawMode(false);
-  console.log("prompt");
-  process.stdin.removeAllListeners("data");
-  globalInterface = readline.createInterface({
-    input: process.stdin,
-    output: process.stdout
-  });
+export function promptInput({ onType, prompt = "" }) {
+  stdin.removeAllListeners("data");
+  stdin.setRawMode(false);
 
-  globalInterface.question("", answer => {
-    console.log("ans ", answer);
-    globalInterface.close();
-    globalInterface = null;
-    onInputFn(answer);
-    setImmediate(() => {
-      if (currentOnKeyPress) initInput(currentOnKeyPress);
-    }, 10);
+  if (prompt) writeLine(prompt);
+
+  stdin.on("data", ($answer) => {
+    const answer = $answer.trim().toLowerCase();
+    if (onType) onType(answer);
   });
 }
