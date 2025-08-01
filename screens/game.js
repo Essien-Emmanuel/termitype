@@ -19,7 +19,7 @@ export default class GameScreen {
     initInput({
       onKeyPress: ($key) => {
         const key = $key.toLowerCase();
-        if (!["a", "h"].includes(key)) return;
+        if (!["a", "h"].includes(key)) return screenMgr.loadGameMenuScreen();
 
         if (key === "a") {
           const damageAmt = Math.ceil(Math.random() * 5);

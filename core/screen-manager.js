@@ -5,6 +5,7 @@ import GameOverScreen from "../screens/game-over.js";
 import GameTieScreen from "../screens/game-tie.js";
 import VictoryScreen from "../screens/victory.js";
 import MenuScreen from "../screens/menu.js";
+import GameMenuScreen from "../screens/game-menu.js";
 
 export default class ScreenManager {
   _setScreen(screen) {
@@ -15,6 +16,11 @@ export default class ScreenManager {
 
   loadMenuScreen() {
     const screen = new MenuScreen();
+    this._setScreen(screen);
+  }
+  
+  loadGameMenuScreen() {
+    const screen = new GameMenuScreen();
     this._setScreen(screen);
   }
 

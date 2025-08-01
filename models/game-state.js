@@ -11,8 +11,12 @@ export default class GameState {
   }
 
   toJSON() {
-    console.log(JSON.stringify(this.data));
+    return JSON.stringify(this.data);
+   
   }
 
-  static fromJSON(data) {}
+  static fromJSON(jsonData) {
+    const dataObj = JSON.parse(jsonData);
+    return new GameState(dataObj);
+  }
 }
