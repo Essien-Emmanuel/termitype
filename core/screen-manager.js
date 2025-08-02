@@ -18,7 +18,7 @@ export default class ScreenManager {
     const screen = new MenuScreen();
     this._setScreen(screen);
   }
-  
+
   loadGameMenuScreen() {
     const screen = new GameMenuScreen();
     this._setScreen(screen);
@@ -34,8 +34,8 @@ export default class ScreenManager {
     this._setScreen(screen);
   }
 
-  loadGameScreen() {
-    const screen = new GameScreen();
+  loadGameScreen(state) {
+    const screen = new GameScreen(state);
     this._setScreen(screen);
   }
 

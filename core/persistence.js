@@ -1,48 +1,51 @@
-import fileSys from "fs";
+import fs from "fs/promises";
 import path from "path";
 
 import GameState from "../models/game-state.js";
 
 const __dirname = import.meta.dirname;
-const fs = fileSys.promises;
 
 export async function saveGame(state) {
-  const strData = state.toJSON();
+  const data = state.toJSON();
+  const strData = JSON.stringify(data, null, 2);
+
+  const fp = path.join(__dirname, "..", "saves", "game-state.json");
+  const dirp = path.join(__dirname, "..", "saves");
 
   try {
-    const fp = path.join(__dirname, "..", "saves", "game-states.json");
+    // create saves folder
+    await fs.mkdir(dirp, {
+      recursive: true,
+    });
+
     await fs.writeFile(fp, strData);
   } catch (exc) {
     console.error(exc);
   }
 }
 
-export async function loadGame() {
-  const filePath = path.join(__dirname, "..", "saves", "game-states.json");
+export async function clearSavedData() {
+  const fp = path.join(__dirname, "..", "saves", "game-state.json");
+  try {
+    await fs.writeFile(fp, "");
+  } catch (exc) {
+    console.error(exc);
+  }
+}
+
+export async function loadGameState() {
+  const filePath = path.join(__dirname, "..", "saves", "game-state.json");
 
   try {
-    const strData = await fs.readFile(filePath);
+    const strData = await fs.readFile(filePath, "utf-8");
     const state = GameState.fromJSON(strData);
-    console.log(state);
-    return;
+    return state;
   } catch (exc) {
     console.log(exc);
   }
 }
 
-const state = new GameState({
-  player: {
-    hp: 20,
-    name: "HERO"
-  },
-  enemy: {
-    hp: 10,
-    name: "GOBLIN"
-  },
-  level: 1,
-  turnCount: 5,
-  currentScreen: "GameScreen"
-});
-saveGame(state).then();
-loadGame().then();
-//read();
+export async function checkGameDefaultState() {
+  const state = await loadGameState();
+  return state.data.isDefault;
+}

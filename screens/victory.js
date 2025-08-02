@@ -1,4 +1,4 @@
-import { writeLine, promptInput } from "../core/io.js";
+import { writeLine, promptInput, initInput } from "../core/io.js";
 export default class VictoryScreen {
   show() {
     writeLine("You Win!");
@@ -6,19 +6,24 @@ export default class VictoryScreen {
   }
 
   handleKeyPress(screenMgr) {
-    promptInput({
-      prompt: "Enter START To Replay Again Or MENU To Go To Game Menu!",
+    const prompt = "\n> n To NEW GAME  \n> m To Main Menu";
 
-      onType: ($key) => {
+    initInput({
+      prompt,
+
+      onKeyPress: ($key) => {
         const key = $key.trim().toLowerCase();
-        if (!["start", "menu"].includes(key)) {
+        if (!["n", "m"].includes(key)) {
+          writeLine("Enter An Option");
           return;
         }
-        if (key === "start") {
+        if (key === "n") {
           screenMgr.loadGameScreen();
+          return;
         }
-        if (key === "menu") {
+        if (key === "m") {
           screenMgr.loadMenuScreen();
+          return;
         }
       },
     });

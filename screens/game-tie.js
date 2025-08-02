@@ -8,7 +8,7 @@ export default class GameTieScreen {
 
   handleKeyPress(screenMgr) {
     promptInput({
-      prompt: "Enter START To Play Again Or STOP To End Game!",
+      prompt: "\n> ENTER = Play \n> q = Quit",
 
       onType: function ($key) {
         const key = $key.trim().toLowerCase();

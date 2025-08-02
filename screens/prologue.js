@@ -8,7 +8,7 @@ export default class PrologueScreen {
 
   handleKeyPress(screenMgr) {
     initInput({
-      prompt: "Press ENTER To continue",
+      prompt: "\n> ENTER = continue",
 
       onKeyPress: function (key) {
         if (key === "\r") {

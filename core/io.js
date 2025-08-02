@@ -21,7 +21,10 @@ export function exit(message = null) {
 export function initInput({ prompt = "", onKeyPress }) {
   stdin.removeAllListeners("data");
 
-  if (prompt) writeLine(prompt);
+  if (prompt) {
+    writeLine(prompt);
+    writeLine();
+  }
 
   stdin.setRawMode(true);
   stdin.setEncoding("utf8");
