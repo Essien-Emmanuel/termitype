@@ -1,4 +1,5 @@
 import { writeLine, promptInput } from "../core/io.js";
+import type ScreenManager from "../core/screen-manager.js";
 
 export default class GameTieScreen {
   show() {
@@ -6,7 +7,7 @@ export default class GameTieScreen {
     writeLine();
   }
 
-  handleKeyPress(screenMgr) {
+  handleKeyPress(screenMgr: ScreenManager) {
     promptInput({
       prompt: "\n> ENTER = Play \n> q = Quit",
 
@@ -14,7 +15,7 @@ export default class GameTieScreen {
         const key = $key.trim().toLowerCase();
 
         if (key.toLowerCase() === "start") {
-          screenMgr.loadGameScreen();
+          screenMgr.loadGameScreen(null);
         }
         if (key.toLowerCase() === "stop") {
           writeLine("Game Ends!");

@@ -5,7 +5,7 @@ import GameState from "../models/game-state.js";
 
 const __dirname = import.meta.dirname;
 
-export async function saveGame(state) {
+export async function saveGame(state: GameState) {
   const data = state.toJSON();
   const strData = JSON.stringify(data, null, 2);
 
@@ -42,10 +42,12 @@ export async function loadGameState() {
     return state;
   } catch (exc) {
     console.log(exc);
+    return null;
   }
 }
 
 export async function checkGameDefaultState() {
   const state = await loadGameState();
-  return state.data.isDefault;
+  if (!state) throw Error("No Game State");
+  return state.config.isDefault;
 }
