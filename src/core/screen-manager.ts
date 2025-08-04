@@ -1,65 +1,28 @@
-import TitleScreen from "../screens/title";
-import PrologueScreen from "../screens/prologue";
-import GameScreen from "../screens/game";
-import GameOverScreen from "../screens/game-over";
-import GameTieScreen from "../screens/game-tie";
-import VictoryScreen from "../screens/victory";
-import MenuScreen from "../screens/menu";
-import GameMenuScreen from "../screens/game-menu";
-import type GameState from "../models/game-state";
-import type { Screen } from "../types";
+import type Engine from "./engine";
+import type Screen from "./screen";
+import type { ScreenManagerRegistry, RegisterScreenArgs } from "@/types";
 
 export default class ScreenManager {
+  public engine: Engine;
+  public registry: ScreenManagerRegistry;
   public currentScreen: Screen | null;
 
-  constructor() {
+  constructor(engine: Engine) {
+    this.engine = engine;
+    this.registry = {};
     this.currentScreen = null;
   }
 
-  _setScreen<T extends Screen>(screen: T) {
-    screen.show();
-    this.currentScreen = screen;
-    screen.handleKeyPress(this);
+  register({ name, screen }: RegisterScreenArgs) {
+    this.registry[name] = screen;
   }
 
-  loadMenuScreen() {
-    const screen = new MenuScreen();
-    this._setScreen(screen);
-  }
+  async load(name: string) {
+    const screenCtor = this.registry[name];
+    console.log("loading screen ", screenCtor);
+    if (!screenCtor) throw new Error(`No Screen ${name}`);
 
-  loadGameMenuScreen() {
-    const screen = new GameMenuScreen();
-    this._setScreen(screen);
-  }
-
-  loadTitleScreen() {
-    const screen = new TitleScreen();
-    this._setScreen(screen);
-  }
-
-  loadPrologueScreen() {
-    const screen = new PrologueScreen();
-    this._setScreen(screen);
-  }
-
-  loadGameScreen(state: GameState | null) {
-    // fix null
-    const screen = new GameScreen(state);
-    this._setScreen(screen);
-  }
-
-  loadGameOverScreen() {
-    const screen = new GameOverScreen();
-    this._setScreen(screen);
-  }
-
-  loadGameTieScreen() {
-    const screen = new GameTieScreen();
-    this._setScreen(screen);
-  }
-
-  loadVictoryScreen() {
-    const screen = new VictoryScreen();
-    this._setScreen(screen);
+    this.currentScreen = new screenCtor(this.engine);
+    await this.currentScreen.init();
   }
 }

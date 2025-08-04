@@ -1,20 +1,12 @@
-import { writeLine, initInput } from "../core/io";
-import type ScreenManager from "../core/screen-manager";
-import type { Screen } from "../types";
+import Screen, { type ScreenUpdateReturnType } from "@/core/screen";
 
-export default class TitleScreen implements Screen {
-  show() {
-    writeLine("Rise of the Reborn");
-    writeLine();
+export default class TitleScreen extends Screen {
+  async init() {
+    console.log("initializing screen...");
   }
 
-  handleKeyPress(screenMgr: ScreenManager) {
-    initInput({
-      onKeyPress: function (key) {
-        if (key === "\r") {
-          screenMgr.loadPrologueScreen();
-        }
-      },
-    });
+  async update(): ScreenUpdateReturnType {
+    console.log("updated title screen");
+    return {};
   }
 }

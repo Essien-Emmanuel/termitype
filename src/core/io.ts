@@ -1,7 +1,5 @@
 import { stdin, stdout, exit as processExit } from "node:process";
 
-import type { InputKeyPressConfig, InputLineConfig } from "../types";
-
 export function clearScreen() {
   stdout.write("\x1B[2J\x1B[0;0H");
 }
@@ -20,30 +18,15 @@ export function exit(message = "") {
   processExit();
 }
 
-export function initInput({ prompt = "", onKeyPress }: InputKeyPressConfig) {
+export function initInput(onData: any) {
   stdin.removeAllListeners("data");
-
-  if (prompt) {
-    writeLine(prompt);
-    writeLine();
-  }
-
   stdin.setRawMode(true);
-  stdin.setEncoding("utf8");
+  stdin.setEncoding("utf-8");
   stdin.resume();
-
-  stdin.on("data", (key: string) => {
-    if (key === "\u0003") {
-      exit();
-    }
-    if (onKeyPress) {
-      onKeyPress(key);
-    }
-  });
-  return;
+  stdin.on("data", onData);
 }
 
-export function promptInput({ onType, prompt = "" }: InputLineConfig) {
+export function promptInput({ onType, prompt = "" }: any) {
   stdin.removeAllListeners("data");
   stdin.setRawMode(false);
 

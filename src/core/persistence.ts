@@ -1,11 +1,9 @@
 import fs from "fs/promises";
 import path from "path";
 
-import GameState from "@/models/game-state.js";
-
 const __dirname = import.meta.dirname;
 
-export async function saveGame(state: GameState) {
+export async function saveGame(state: any) {
   const data = state.toJSON();
   const strData = JSON.stringify(data, null, 2);
 
@@ -38,19 +36,9 @@ export async function loadGameState() {
 
   try {
     const strData = await fs.readFile(filePath, "utf-8");
-    const state = GameState.fromJSON(strData);
-    return state;
+    return strData;
   } catch (exc) {
     console.log(exc);
     return null;
   }
 }
-
-export async function checkGameDefaultState() {
-  const state = await loadGameState();
-  if (!state) throw Error("No Game State");
-  return state.config.isDefault;
-}
-
-const state = await loadGameState();
-console.log(state);
