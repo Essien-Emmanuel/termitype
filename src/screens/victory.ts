@@ -1,5 +1,5 @@
-import { writeLine, initInput } from "../core/io.js";
-import type ScreenManager from "../core/screen-manager";
+import { writeLine, initInput } from "@/core/io.js";
+import type ScreenManager from "@/core/screen-manager";
 
 export default class VictoryScreen {
   show() {

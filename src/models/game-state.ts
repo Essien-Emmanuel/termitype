@@ -1,5 +1,5 @@
-import type { GameStateConfig } from "../types";
-import { topLevelSafeObject } from "../utils";
+import type { GameStateConfig } from "@/types";
+import { topLevelSafeObject } from "@/utils/helper";
 import Entity from "./entity";
 
 export default class GameState {

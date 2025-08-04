@@ -6,7 +6,7 @@
   },
   "enemy": {
     "name": "GOBLIN",
-    "hp": 6
+    "hp": 9
   },
   "turnCount": 5,
   "level": 1,

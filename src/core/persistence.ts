@@ -1,7 +1,7 @@
 import fs from "fs/promises";
 import path from "path";
 
-import GameState from "../models/game-state.js";
+import GameState from "@/models/game-state.js";
 
 const __dirname = import.meta.dirname;
 
@@ -51,3 +51,6 @@ export async function checkGameDefaultState() {
   if (!state) throw Error("No Game State");
   return state.config.isDefault;
 }
+
+const state = await loadGameState();
+console.log(state);
