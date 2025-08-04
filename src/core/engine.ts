@@ -1,5 +1,8 @@
-import { clearScreen, exit, initInput } from "./io";
+import { exit, initInput } from "./io";
 import ScreenManager from "./screen-manager";
+import Input from "./input";
+
+const { isEnter } = Input;
 
 export default class Engine {
   public screenManager: ScreenManager;
@@ -24,11 +27,11 @@ export default class Engine {
 
   async loop() {
     while (this.running) {
-      clearScreen();
+     // clearScreen();
       await new Promise((resolve) => {
         // handle ctrl c to quit
         initInput((key: string) => {
-          if (key === "\u0003") exit();
+          if (isEnter(key)) exit();
           this.inputKey = key;
           resolve(null);
         });
