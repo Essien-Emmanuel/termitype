@@ -1,6 +1,10 @@
 import type Engine from "./engine";
 import type Screen from "./screen";
-import type { ScreenManagerRegistry, RegisterScreenArgs } from "@/types";
+import type {
+  ScreenManagerRegistry,
+  RegisterScreenArgs,
+  ScreenConstructor,
+} from "@/types";
 
 export default class ScreenManager {
   public engine: Engine;
@@ -9,19 +13,20 @@ export default class ScreenManager {
 
   constructor(engine: Engine) {
     this.engine = engine;
-    this.registry = {};
+    this.registry = new Map<string, ScreenConstructor>();
     this.currentScreen = null;
   }
 
-  register({ name, screen }: RegisterScreenArgs) {
-    this.registry[name] = screen;
+  register<K extends string>({ name, screen }: RegisterScreenArgs<K>) {
+    this.registry.set(name, screen);
+    return this;
   }
 
   async load(name: string) {
-    const screenCtor = this.registry[name];
-    if (!screenCtor) throw new Error(`No Screen ${name}`);
+    const screenCtor = this.registry.get(name);
+    if (!screenCtor) throw new Error(`No Screen ${String(name)}`);
 
-    this.currentScreen = new screenCtor(this.engine);
+    this.currentScreen = new screenCtor(this.engine as Engine);
     await this.currentScreen.init();
   }
 }

@@ -3,11 +3,9 @@ import type Screen from "./core/screen";
 
 export type ScreenConstructor = new (engine: Engine) => Screen;
 
-export interface ScreenManagerRegistry {
-  [key: string]: ScreenConstructor;
-}
+export type ScreenManagerRegistry = Map<string, ScreenConstructor>;
 
-export interface RegisterScreenArgs {
-  name: string;
+export interface RegisterScreenArgs<K extends string> {
+  name: K;
   screen: ScreenConstructor;
 }
