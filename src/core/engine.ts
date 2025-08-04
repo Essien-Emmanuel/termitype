@@ -12,18 +12,29 @@ export default class Engine {
     this.inputKey = null;
   }
 
+  async _updateCurrentScreenThenNext() {
+    const result = await this.screenManager.currentScreen?.update(
+      this.inputKey!
+    );
+    this.inputKey = null;
+    if (result && result.nextScreenName) {
+      await this.screenManager.load(result.nextScreenName);
+    }
+  }
+
   async loop() {
     while (this.running) {
       clearScreen();
-      const result = await this.screenManager.currentScreen?.update(
-        this.inputKey!
-      );
-      this.inputKey = null;
-      if (result && result.nextScreenName) {
-        await this.screenManager.load(result.nextScreenName);
-      } else {
-        this.stop();
-      }
+      await new Promise((resolve) => {
+        // handle ctrl c to quit
+        initInput((key: string) => {
+          if (key === "\u0003") exit();
+          this.inputKey = key;
+          resolve(null);
+        });
+      });
+
+      await this._updateCurrentScreenThenNext();
     }
   }
 
@@ -31,16 +42,13 @@ export default class Engine {
     this.running = true;
 
     await this.screenManager.load(initialScreenName);
-    // handle ctrl c to quit
-    initInput((key: string) => {
-      if (key === "\u0003") exit();
-      this.inputKey = key;
+    await this._updateCurrentScreenThenNext();
 
-      this.loop();
-    });
+    await this.loop();
   }
 
   stop() {
     this.running = false;
+    console.log("engine stops");
   }
 }

@@ -6,9 +6,7 @@ export default class Prologue extends Screen {
   }
 
   async update(key: string): ScreenUpdateReturnType {
-    console.log("updating");
-    if (key === "\r") {
-      console.log("ENTER");
+    if (typeof key === "string" && key === "q") {
       this.engine.stop();
     }
     return {};
