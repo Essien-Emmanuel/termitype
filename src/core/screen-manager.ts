@@ -10,11 +10,13 @@ export default class ScreenManager {
   public engine: Engine;
   public registry: ScreenManagerRegistry;
   public currentScreen: Screen | null;
+  public currentScreenName: string | null
 
   constructor(engine: Engine) {
     this.engine = engine;
     this.registry = new Map<string, ScreenConstructor>();
     this.currentScreen = null;
+    this.currentScreenName = null;
   }
 
   register<K extends string>({ name, screen }: RegisterScreenArgs<K>) {
@@ -28,5 +30,6 @@ export default class ScreenManager {
 
     this.currentScreen = new screenCtor(this.engine as Engine);
     await this.currentScreen.init();
+    this.currentScreenName = name;
   }
 }

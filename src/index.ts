@@ -10,3 +10,4 @@ engine.screenManager
   .register({ name: "game", screen: GameScreen });
 
 engine.start("title");
+console.log(engine.getState())

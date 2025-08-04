@@ -13,4 +13,6 @@ export default class Screen {
   async update(_key: string): ScreenUpdateReturnType {
     return {};
   }
+  
+  getState() {}
 }

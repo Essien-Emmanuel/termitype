@@ -2,7 +2,7 @@ import { exit, initInput } from "./io";
 import ScreenManager from "./screen-manager";
 import Input from "./input";
 
-const { isEnter } = Input;
+const { isCtrlC } = Input;
 
 export default class Engine {
   public screenManager: ScreenManager;
@@ -27,11 +27,11 @@ export default class Engine {
 
   async loop() {
     while (this.running) {
-     // clearScreen();
-      await new Promise((resolve) => {
+      // clearScreen();
+      await new Promise(resolve => {
         // handle ctrl c to quit
         initInput((key: string) => {
-          if (isEnter(key)) exit();
+          if (isCtrlC(key)) exit();
           this.inputKey = key;
           resolve(null);
         });
@@ -54,4 +54,14 @@ export default class Engine {
     this.running = false;
     console.log("engine stops");
   }
+
+  getEngineState() {
+    return {
+      running: this.running,
+      inputKey: this.inputKey,
+      currentScreenName: this.screenManager.currentScreenName
+    };
+  }
+  
+  getGameState() {}
 }
