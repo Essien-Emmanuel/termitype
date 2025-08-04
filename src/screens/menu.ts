@@ -1,22 +1,22 @@
-import { writeLine, promptInput, exit, initInput } from "../core/io.js";
+import { writeLine, exit, initInput } from "../core/io";
+import type ScreenManager from "../core/screen-manager";
+import type { Screen } from "../types";
+
 import {
   checkGameDefaultState,
   clearSavedData,
   loadGameState,
   saveGame,
-} from "../core/persistence.js";
-import Entity from "../models/entity.js";
-import GameState from "../models/game-state.js";
-export default class MenuScreen {
-  constructor() {
-    this.self = this;
-  }
+} from "../core/persistence";
+import Entity from "../models/entity";
+import GameState from "../models/game-state";
 
+export default class MenuScreen implements Screen {
   show() {
     writeLine("MAIN MENU:");
   }
 
-  async handleKeyPress(screenMgr) {
+  async handleKeyPress(screenMgr: ScreenManager) {
     const isDefaultGameState = await checkGameDefaultState();
 
     const progressOpt = !isDefaultGameState
@@ -35,7 +35,7 @@ export default class MenuScreen {
         }
 
         if (key === "\r") {
-          screenMgr.loadGameScreen();
+          screenMgr.loadGameScreen(null);
           return;
         }
 
@@ -47,30 +47,31 @@ export default class MenuScreen {
 
         if (key.toLowerCase() === "x") {
           initInput({
-            prompt: "Are You Sure About Clearing Your Saved Progress? (Y/N)",
+            prompt:
+              "Are You Sure About Clearing Your Saved Progress? \nPress y to confirm or any key to cancel",
 
             onKeyPress: async (key) => {
-              if (key.toLowerCase() === "n") {
-                screenMgr.loadMenuScreen();
-                return;
-              } else if (key.toLowerCase() === "y") {
-                await clearSavedData();
-
-                const player = new Entity("HERO", 20);
-                const enemy = new Entity("GOBLIN", 10);
-
-                const defaultState = new GameState({
-                  player,
-                  enemy,
-                  level: 1,
-                  turnCount: 5,
-                  currentScreen: "GameScreen",
-                  isDefault: true,
-                });
-                await saveGame(defaultState);
+              if (key.toLowerCase() !== "y") {
                 screenMgr.loadMenuScreen();
                 return;
               }
+
+              await clearSavedData();
+
+              const player = new Entity("HERO", 20);
+              const enemy = new Entity("GOBLIN", 10);
+
+              const defaultState = new GameState({
+                player,
+                enemy,
+                level: 1,
+                turnCount: 5,
+                currentScreen: "GameScreen",
+                isDefault: true,
+              });
+              await saveGame(defaultState);
+              screenMgr.loadMenuScreen();
+              return;
             },
           });
           return;

@@ -2,11 +2,11 @@
   "currentScreen": "GameScreen",
   "player": {
     "name": "HERO",
-    "hp": 10
+    "hp": 17
   },
   "enemy": {
     "name": "GOBLIN",
-    "hp": 5
+    "hp": 9
   },
   "turnCount": 5,
   "level": 1,

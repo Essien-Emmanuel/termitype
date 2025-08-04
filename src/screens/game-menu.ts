@@ -1,16 +1,13 @@
-import { writeLine, promptInput, exit, initInput } from "../core/io.js";
+import { writeLine, exit, initInput } from "../core/io.js";
 import { loadGameState } from "../core/persistence.js";
+import type ScreenManager from "../core/screen-manager.js";
 export default class GameMenuScreen {
-  constructor() {
-    this.self = this;
-  }
-
   show() {
     writeLine();
     writeLine("GAME MENU:");
   }
 
-  handleKeyPress(screenMgr) {
+  handleKeyPress(screenMgr: ScreenManager) {
     const prompt =
       "\n> r = RESUME \n> p = Pause \n> n = NEW GAME \n> q = Quit \n> m = Main Menu";
 
@@ -27,10 +24,10 @@ export default class GameMenuScreen {
         // resume from last saved state
         if (key === "r") {
           const state = await loadGameState();
-          if (state.currentScreen === "GameScreen") {
+          if (state?.config.currentScreen === "GameScreen") {
             screenMgr.loadGameScreen(state);
             return;
-          } else if (state.currentScreen === "MenuScreen") {
+          } else if (state?.config.currentScreen === "MenuScreen") {
             screenMgr.loadGameMenuScreen();
           }
         }
@@ -42,7 +39,7 @@ export default class GameMenuScreen {
 
         // new game
         if (key === "n") {
-          screenMgr.loadGameScreen();
+          screenMgr.loadGameScreen(null);
           return;
         }
 

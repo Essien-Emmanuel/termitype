@@ -1,12 +1,14 @@
-import { initInput, writeLine } from "../core/io.js";
+import { initInput, writeLine } from "../core/io";
+import type ScreenManager from "../core/screen-manager";
+import type { Screen } from "../types";
 
-export default class PrologueScreen {
+export default class PrologueScreen implements Screen {
   show() {
     writeLine("PROLOGUE");
     writeLine();
   }
 
-  handleKeyPress(screenMgr) {
+  handleKeyPress(screenMgr: ScreenManager) {
     initInput({
       prompt: "\n> ENTER = continue",
 

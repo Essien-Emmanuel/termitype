@@ -1,16 +1,24 @@
-import TitleScreen from "../screens/title.js";
-import PrologueScreen from "../screens/prologue.js";
-import GameScreen from "../screens/game.js";
-import GameOverScreen from "../screens/game-over.js";
-import GameTieScreen from "../screens/game-tie.js";
-import VictoryScreen from "../screens/victory.js";
-import MenuScreen from "../screens/menu.js";
-import GameMenuScreen from "../screens/game-menu.js";
+import TitleScreen from "../screens/title";
+import PrologueScreen from "../screens/prologue";
+import GameScreen from "../screens/game";
+import GameOverScreen from "../screens/game-over";
+import GameTieScreen from "../screens/game-tie";
+import VictoryScreen from "../screens/victory";
+import MenuScreen from "../screens/menu";
+import GameMenuScreen from "../screens/game-menu";
+import type GameState from "../models/game-state";
+import type { Screen } from "../types";
 
 export default class ScreenManager {
-  _setScreen(screen) {
+  public currentScreen: Screen | null;
+
+  constructor() {
+    this.currentScreen = null;
+  }
+
+  _setScreen<T extends Screen>(screen: T) {
     screen.show();
-    this.activeScreen = screen;
+    this.currentScreen = screen;
     screen.handleKeyPress(this);
   }
 
@@ -34,7 +42,8 @@ export default class ScreenManager {
     this._setScreen(screen);
   }
 
-  loadGameScreen(state) {
+  loadGameScreen(state: GameState | null) {
+    // fix null
     const screen = new GameScreen(state);
     this._setScreen(screen);
   }

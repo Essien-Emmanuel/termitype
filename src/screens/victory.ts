@@ -1,11 +1,13 @@
-import { writeLine, promptInput, initInput } from "../core/io.js";
+import { writeLine, initInput } from "@/core/io.js";
+import type ScreenManager from "@/core/screen-manager";
+
 export default class VictoryScreen {
   show() {
     writeLine("You Win!");
     writeLine();
   }
 
-  handleKeyPress(screenMgr) {
+  handleKeyPress(screenMgr: ScreenManager) {
     const prompt = "\n> n To NEW GAME  \n> m To Main Menu";
 
     initInput({
@@ -18,7 +20,7 @@ export default class VictoryScreen {
           return;
         }
         if (key === "n") {
-          screenMgr.loadGameScreen();
+          screenMgr.loadGameScreen(null);
           return;
         }
         if (key === "m") {

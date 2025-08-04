@@ -1,12 +1,18 @@
-import { writeLine, initInput } from "../core/io.js";
-import { saveGame } from "../core/persistence.js";
-import Entity from "../models/entity.js";
-import GameState from "../models/game-state.js";
+import { writeLine, initInput } from "../core/io";
+import { saveGame } from "../core/persistence";
+import type ScreenManager from "../core/screen-manager";
+import Entity from "../models/entity";
+import GameState from "../models/game-state";
 
 export default class GameScreen {
-  constructor(state) {
-    this.player = null;
-    this.enemy = null;
+  public player: Entity;
+  public enemy: Entity;
+  public state: GameState | null;
+  public isStarted: boolean;
+
+  constructor(state: GameState | null) {
+    this.player = new Entity();
+    this.enemy = new Entity();
     this.state = state;
     this.isStarted = false;
   }
@@ -21,8 +27,8 @@ export default class GameScreen {
   show() {
     if (this.state) {
       writeLine("Loading saved game...");
-      this.player = this.state.data.player;
-      this.enemy = this.state.data.enemy;
+      this.player = this.state.config.player;
+      this.enemy = this.state.config.enemy;
       this._showStats();
       return;
     }
@@ -36,7 +42,7 @@ export default class GameScreen {
     return;
   }
 
-  handleKeyPress(screenMgr) {
+  handleKeyPress(screenMgr: ScreenManager) {
     initInput({
       onKeyPress: async ($key) => {
         const key = $key.toLowerCase();
