@@ -10,8 +10,7 @@ export default class Screen {
 
   async init() {}
 
-  async update(key: string): ScreenUpdateReturnType {
-    console.log("key ", key);
+  async update(_key: string): ScreenUpdateReturnType {
     return {};
   }
 }

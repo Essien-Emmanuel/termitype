@@ -19,7 +19,6 @@ export default class ScreenManager {
 
   async load(name: string) {
     const screenCtor = this.registry[name];
-    console.log("loading screen ", screenCtor);
     if (!screenCtor) throw new Error(`No Screen ${name}`);
 
     this.currentScreen = new screenCtor(this.engine);

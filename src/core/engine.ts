@@ -1,4 +1,4 @@
-import { exit, initInput } from "./io";
+import { clearScreen, exit, initInput } from "./io";
 import ScreenManager from "./screen-manager";
 
 export default class Engine {
@@ -12,25 +12,37 @@ export default class Engine {
     this.inputKey = null;
   }
 
+  async loop() {
+    let c = 0;
+    console.log(this.running);
+    while (this.running && c < 30) {
+      console.log("looping");
+      clearScreen();
+      const result = await this.screenManager.currentScreen?.update(
+        this.inputKey!
+      );
+      if (result && result.nextScreenName) {
+        await this.screenManager.load(result.nextScreenName);
+      } else {
+        console.log("no next");
+      }
+      c++;
+    }
+  }
+
   async start(initialScreenName: string) {
     this.running = true;
+
+    await this.screenManager.load(initialScreenName);
 
     // handle ctrl c to quit
     initInput((key: string) => {
       console.log("in input handler", key);
       if (key === "\u0003") exit();
       this.inputKey = key;
+
+      this.loop();
     });
-
-    // load initial screen
-    await this.screenManager.load(initialScreenName);
-
-    // loop
-    while (this.running) {
-      await this.screenManager.currentScreen?.update(this.inputKey);
-    }
-
-    console.log("key ", this.inputKey);
   }
 
   stop() {
