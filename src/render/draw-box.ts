@@ -20,4 +20,4 @@ export default function drawBox(contents: string[], _options?: {}) {
   return;
 }
 
-drawBox(["game", "prologue", "car", "settings"]);
+drawBox(["game", "prologue", "car", "settings", "fps"]);
