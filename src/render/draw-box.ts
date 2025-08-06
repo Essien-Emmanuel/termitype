@@ -1,11 +1,20 @@
+import { getTextMaxLength } from "./utils/helper";
+
+const defaultPaddingLength = 2;
+
 export default function drawBox(contents: string[], _options?: {}) {
-  const rightBoarderPos = contents[0].length + 2;
-  const horizontalBoarder = "+" + "-".repeat(rightBoarderPos) + "+";
-  const veritcalBoarder = "| " + contents[0] + " |";
-  console.log(horizontalBoarder);
-  console.log(veritcalBoarder);
-  console.log(horizontalBoarder);
+  const contentsMaxLen = getTextMaxLength(contents);
+  const hBoarderLen = contentsMaxLen + defaultPaddingLength;
+
+  const hBoarder = "+" + "-".repeat(hBoarderLen) + "+";
+  console.log(hBoarder);
+  for (let i = 0; i < contents.length; i++) {
+    const vBoarder = "| " + contents[i].trim() + " |";
+    console.log(vBoarder);
+  }
+
+  console.log(hBoarder);
   return;
 }
 
-drawBox(["game"]);
+drawBox(["game", "prologue", "car"]);
