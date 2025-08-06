@@ -9,7 +9,10 @@ export default function drawBox(contents: string[], _options?: {}) {
   const hBoarder = "+" + "-".repeat(hBoarderLen) + "+";
   console.log(hBoarder);
   for (let i = 0; i < contents.length; i++) {
-    const vBoarder = "| " + contents[i].trim() + " |";
+    const yPadComplete = contentsMaxLen - contents[i].length;
+
+    const vBoarder =
+      "| " + contents[i].trim() + " ".repeat(yPadComplete) + " |";
     console.log(vBoarder);
   }
 
@@ -17,4 +20,4 @@ export default function drawBox(contents: string[], _options?: {}) {
   return;
 }
 
-drawBox(["game", "prologue", "car"]);
+drawBox(["game", "prologue", "car", "settings"]);
