@@ -1,7 +1,7 @@
 import Engine from "@/core/engine";
 import TitleScreen from "./screens/title";
 import Prologue from "./screens/prologue";
-import GameScreen from "./screens/game";
+import GameScreen from "@/screens/game";
 
 const engine = new Engine();
 engine.screenManager
@@ -10,4 +10,4 @@ engine.screenManager
   .register({ name: "game", screen: GameScreen });
 
 engine.start("title");
-console.log(engine.getState())
+console.log(engine.getEngineState());

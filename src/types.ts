@@ -9,3 +9,8 @@ export interface RegisterScreenArgs<K extends string> {
   name: K;
   screen: ScreenConstructor;
 }
+
+export interface CenterTextOptions {
+  padding?: "left" | "right";
+  padLength?: number;
+}
