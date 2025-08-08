@@ -1,4 +1,4 @@
-import { getTextMaxLength } from "../utils/helper";
+import { getTextMaxLength, validatePadLength } from "../utils/helper";
 import { borderStyles } from "./border-styles";
 
 const defaultPaddingLength = 2;
@@ -37,22 +37,33 @@ export interface NamedBorderOption {
 
 export type BorderOption = CustomBorderOption | NamedBorderOption;
 
+export type PaddingSide = "top" | "right" | "bottom" | "left" | "all";
+
+/**
+ * First option, If no side, length is applied to all sides
+ * Second option, string reps shorthand: 'side-lemgth'
+ */
+export type PaddingConfig =
+  | {
+      side?: PaddingSide;
+      length: number;
+    }
+  | string;
+
 /**
  * Border shorthand "width-style-color"
- * Example: "23-dotted-red"
+ * Example: "dotted-red"
  */
 export interface DrawBoxOptions {
   border?:
     | {
         style?: BorderOption;
-        width?: number;
         margin?: number;
-        padding?: number;
+        padding?: PaddingConfig;
         color?: string;
       }
     | string;
   borderColor?: string;
-  borderWith?: number;
 }
 
 export interface DrawBoxConfig {
@@ -68,13 +79,30 @@ export default function drawBox({ contents, options }: DrawBoxConfig) {
 
   if (options) {
     if (options.border) {
-      if (typeof options.border !== "string") {
-        if (options.border.style && !("custom" in options.border.style)) {
-          borderStyle = borderStyles[options.border.style.preset];
-        } else if (options.border.style && "custom" in options.border.style) {
-          borderStyle = options.border.style.custom;
+      const border = options.border;
+
+      if (typeof border !== "string") {
+        if (border.style) {
+          const style = border.style;
+
+          if (!("custom" in style)) {
+            borderStyle = borderStyles[style.preset];
+          } else if (style && "custom" in style) {
+            borderStyle = style.custom;
+          }
+        }
+        if (border.padding) {
+          const padding = border.padding;
+
+          if (typeof padding !== "string") {
+            const padLen = padding.length;
+            validatePadLength(padLen);
+            // last work
+          }
         }
       }
+      const [$style] = border.toString().trim().split("-");
+      borderStyle = borderStyles[$style as NamedBorderStyle];
     }
   }
 
@@ -113,7 +141,10 @@ export default function drawBox({ contents, options }: DrawBoxConfig) {
 
   return;
 }
+
 drawBox({
   contents: ["game", "prologue", "car", "settings", "fps"],
-  options: { border: { style: { preset: "double" } } },
+  options: {
+    border: "bold-red",
+  },
 });

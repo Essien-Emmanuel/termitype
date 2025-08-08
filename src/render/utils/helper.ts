@@ -6,7 +6,7 @@ export function getTextMaxLength(texts: string[]) {
   return maxTextLen;
 }
 
-export function validatePadLength(_texts: string[], padLen: number) {
+export function validatePadLength(padLen: number, _texts?: string[]) {
   if (padLen) {
     if (!Number.isFinite(padLen)) {
       throw new TypeError("PadLength must be a finite number.");
@@ -33,7 +33,7 @@ export function textCenterRightPadding(texts: string[], padLen?: number) {
   const maxTextLen = getTextMaxLength(texts);
 
   if (padLen) {
-    validatePadLength(texts, padLen);
+    validatePadLength(padLen, texts);
   }
 
   texts.map((text) => {
@@ -56,7 +56,7 @@ export function textCenterLeftPadding(texts: string[], padLen?: number) {
   const maxTextLen = getTextMaxLength(texts);
 
   if (padLen) {
-    validatePadLength(texts, padLen);
+    validatePadLength(padLen, texts);
   }
 
   texts.map((text) => {
