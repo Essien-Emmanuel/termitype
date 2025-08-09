@@ -77,6 +77,10 @@ export default function drawBox({ contents, options }: DrawBoxConfig) {
 
   let borderStyle = borderStyles["bold"];
 
+  let marginLen = 0;
+  let padLeft = 0;
+  let padRight = 0;
+
   if (options) {
     if (options.border) {
       const border = options.border;
@@ -91,18 +95,33 @@ export default function drawBox({ contents, options }: DrawBoxConfig) {
             borderStyle = style.custom;
           }
         }
+
+        if (border.margin) {
+          marginLen = border.margin;
+        }
+
         if (border.padding) {
           const padding = border.padding;
 
           if (typeof padding !== "string") {
             const padLen = padding.length;
             validatePadLength(padLen);
+            if ("side" in padding) {
+              const side = padding.side;
+              if (side === "left") {
+                padLeft = marginLen + 2 + padLeft;
+              } else if (side === "right") {
+                padRight = marginLen + 2;
+              }
+            }
+            marginLen = marginLen + 1 + padLen;
             // last work
           }
         }
+      } else {
+        const [$style] = border.toString().trim().split("-");
+        borderStyle = borderStyles[$style as NamedBorderStyle];
       }
-      const [$style] = border.toString().trim().split("-");
-      borderStyle = borderStyles[$style as NamedBorderStyle];
     }
   }
 
@@ -126,15 +145,23 @@ export default function drawBox({ contents, options }: DrawBoxConfig) {
   const bl = bottomLeft;
   const l = left;
 
-  const topBorder = tl + t.repeat(hBoarderLen) + tr;
-  const bottomBorder = bl + b.repeat(hBoarderLen) + br;
+  const margin = " ".repeat(marginLen);
+
+  const topBorder = margin + tl + t.repeat(hBoarderLen) + tr;
+  const bottomBorder = margin + bl + b.repeat(hBoarderLen) + br;
 
   console.log(topBorder);
   for (let i = 0; i < contents.length; i++) {
     const yPadComplete = contentsMaxLen - contents[i].length;
 
     const sideBorderNContent =
-      l + " " + contents[i].trim() + " ".repeat(yPadComplete) + " " + r;
+      margin +
+      l +
+      " " +
+      contents[i].trim() +
+      " ".repeat(yPadComplete) +
+      " " +
+      r;
     console.log(sideBorderNContent);
   }
   console.log(bottomBorder);
@@ -145,6 +172,6 @@ export default function drawBox({ contents, options }: DrawBoxConfig) {
 drawBox({
   contents: ["game", "prologue", "car", "settings", "fps"],
   options: {
-    border: "bold-red",
+    border: { style: { preset: "bold" }, margin: 10, padding: { length: 5 } },
   },
 });
