@@ -41,7 +41,7 @@ export type PaddingSide = "top" | "right" | "bottom" | "left" | "all";
 
 /**
  * First option, If no side, length is applied to all sides
- * Second option, string reps shorthand: 'side-lemgth'
+ * Second option, string reps shorthand: 'length-side'
  */
 export type PaddingConfig =
   | {
@@ -75,11 +75,11 @@ export default function drawBox({ contents, options }: DrawBoxConfig) {
   const contentsMaxLen = getTextMaxLength(contents);
   const hBoarderLen = contentsMaxLen + defaultPaddingLength;
 
-  let borderStyle = borderStyles["bold"];
-
   let marginLen = 0;
   let padLeft = 0;
   let padRight = 0;
+
+  let borderStyle = borderStyles["bold"];
 
   if (options) {
     if (options.border) {
@@ -106,15 +106,34 @@ export default function drawBox({ contents, options }: DrawBoxConfig) {
           if (typeof padding !== "string") {
             const padLen = padding.length;
             validatePadLength(padLen);
+
             if ("side" in padding) {
               const side = padding.side;
               if (side === "left") {
-                padLeft = marginLen + 2 + padLeft;
+                padLeft += padLen;
               } else if (side === "right") {
-                padRight = marginLen + 2;
+                padRight += padLen;
+              } else if (side === "all") {
+                padLeft += padLen;
+                padRight += padLen;
               }
+            } else {
+              const quarterLen = Math.round(padLen / 2);
+              padLeft += quarterLen;
+              padRight += quarterLen;
             }
-            marginLen = marginLen + 1 + padLen;
+          } else {
+            const [padLen, side] = padding.split("-");
+            const $padLen = Number(padLen);
+
+            if (side === "left") {
+              padLeft += $padLen;
+            } else if (side === "right") {
+              padRight += $padLen;
+            } else if (side === "all") {
+              padLeft += $padLen;
+              padRight += $padLen;
+            }
             // last work
           }
         }
@@ -146,9 +165,19 @@ export default function drawBox({ contents, options }: DrawBoxConfig) {
   const l = left;
 
   const margin = " ".repeat(marginLen);
+  const leftPadding = padLeft > 0 ? " ".repeat(padLeft + 1) : " ";
+  const rightPadding = padRight > 0 ? " ".repeat(padRight + 1) : " ";
 
-  const topBorder = margin + tl + t.repeat(hBoarderLen) + tr;
-  const bottomBorder = margin + bl + b.repeat(hBoarderLen) + br;
+  let pad = 0;
+  if (padLeft) {
+    pad += padLeft;
+  }
+  if (padRight) {
+    pad += padRight;
+  }
+
+  const topBorder = margin + tl + t.repeat(hBoarderLen + pad) + tr;
+  const bottomBorder = margin + bl + b.repeat(hBoarderLen + pad) + br;
 
   console.log(topBorder);
   for (let i = 0; i < contents.length; i++) {
@@ -157,10 +186,10 @@ export default function drawBox({ contents, options }: DrawBoxConfig) {
     const sideBorderNContent =
       margin +
       l +
-      " " +
+      leftPadding +
       contents[i].trim() +
       " ".repeat(yPadComplete) +
-      " " +
+      rightPadding +
       r;
     console.log(sideBorderNContent);
   }
@@ -172,6 +201,11 @@ export default function drawBox({ contents, options }: DrawBoxConfig) {
 drawBox({
   contents: ["game", "prologue", "car", "settings", "fps"],
   options: {
-    border: { style: { preset: "bold" }, margin: 10, padding: { length: 5 } },
+    border: {
+      style: { preset: "bold" },
+      margin: 10,
+      // padding: { length: 20, side: "left" },
+      padding: "5-all",
+    },
   },
 });
