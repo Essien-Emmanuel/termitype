@@ -204,8 +204,8 @@ drawBox({
     border: {
       style: { preset: "bold" },
       margin: 10,
-      // padding: { length: 20, side: "left" },
-      padding: "5-all",
+      padding: { length: 20, side: "right" },
+      // padding: "5-all",
     },
   },
 });
