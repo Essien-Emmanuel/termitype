@@ -32,16 +32,6 @@ export default class Engine {
   async loop() {
     let count = 0;
     while (this.running && count < 4) {
-      await new Promise((resolve) => {
-        promptInput(
-          (input: string) => {
-            this.inputKey = input;
-            console.log("input from prompt", input);
-          },
-          { prompt: "type attack >>> " }
-        );
-        resolve(null);
-      });
       await this._updateCurrentScreenThenNext();
       ++count;
     }

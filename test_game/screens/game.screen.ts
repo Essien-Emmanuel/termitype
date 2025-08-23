@@ -7,13 +7,6 @@ export class GameScreen extends Screen {
   }
 
   async update(key: string): ScreenUpdateReturnType {
-    this.engine.inputType = "line";
-    this.engine.inputConfig = {
-      fn: (input: string) => {
-        console.log("input ", input);
-      },
-      prompt: "Type attack: ",
-    };
     return {};
   }
 }
