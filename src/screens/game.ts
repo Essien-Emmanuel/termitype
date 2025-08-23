@@ -6,9 +6,11 @@ export default class GameScreen extends Screen {
   }
 
   async update(key: string): ScreenUpdateReturnType {
+    console.log("past");
     if (typeof key === "string" && key === "q") {
       this.engine.stop();
     }
+
     return {};
   }
 }

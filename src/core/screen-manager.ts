@@ -7,10 +7,10 @@ import type {
 } from "@/types";
 
 export default class ScreenManager {
-  public engine: Engine;
-  public registry: ScreenManagerRegistry;
+  private engine: Engine;
+  private registry: ScreenManagerRegistry;
   public currentScreen: Screen | null;
-  public currentScreenName: string | null
+  public currentScreenName: string | null;
 
   constructor(engine: Engine) {
     this.engine = engine;

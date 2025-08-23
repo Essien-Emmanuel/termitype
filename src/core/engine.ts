@@ -1,18 +1,22 @@
-import { exit, initInput } from "./io";
+import { promptInput } from "./io";
 import ScreenManager from "./screen-manager";
 import Input from "./input";
-
-const { isCtrlC } = Input;
 
 export default class Engine {
   public screenManager: ScreenManager;
   public running: boolean;
   public inputKey: string | null;
+  public inputConfig: {
+    fn: (input: "string") => void;
+    prompt: string;
+    timeout?: number;
+  } | null;
 
   constructor() {
     this.screenManager = new ScreenManager(this);
     this.running = false;
     this.inputKey = null;
+    this.inputConfig = null;
   }
 
   async _updateCurrentScreenThenNext() {
@@ -26,18 +30,20 @@ export default class Engine {
   }
 
   async loop() {
-    while (this.running) {
-      // clearScreen();
-      await new Promise(resolve => {
-        // handle ctrl c to quit
-        initInput((key: string) => {
-          if (isCtrlC(key)) exit();
-          this.inputKey = key;
-          resolve(null);
-        });
+    let count = 0;
+    while (this.running && count < 4) {
+      await new Promise((resolve) => {
+        promptInput(
+          (input: string) => {
+            this.inputKey = input;
+            console.log("input from prompt", input);
+          },
+          { prompt: "type attack >>> " }
+        );
+        resolve(null);
       });
-
       await this._updateCurrentScreenThenNext();
+      ++count;
     }
   }
 
@@ -45,23 +51,22 @@ export default class Engine {
     this.running = true;
 
     await this.screenManager.load(initialScreenName);
-    await this._updateCurrentScreenThenNext();
 
     await this.loop();
   }
 
   stop() {
     this.running = false;
-    console.log("engine stops");
+    console.log("engine halted!");
   }
 
   getEngineState() {
     return {
       running: this.running,
       inputKey: this.inputKey,
-      currentScreenName: this.screenManager.currentScreenName
+      currentScreenName: this.screenManager.currentScreenName,
     };
   }
-  
+
   getGameState() {}
 }
