@@ -1,6 +1,6 @@
 import blessed, { Widgets } from "blessed";
 
-export class Renderer {
+class _Renderer {
   createScreen(options?: Widgets.IScreenOptions) {
     return blessed.screen(options);
   }
@@ -9,3 +9,5 @@ export class Renderer {
     return blessed.box(options);
   }
 }
+
+export const Renderer = new _Renderer();

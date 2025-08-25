@@ -1,5 +1,5 @@
-import Input from "@/core/input";
-import Screen, { type ScreenUpdateReturnType } from "@/core/screen";
+import Input from "../../src/core/input";
+import Screen, { ScreenUpdateReturnType } from "../../src/core/screen";
 
 export default class Prologue extends Screen {
   async init(): Promise<void> {
