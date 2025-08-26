@@ -23,7 +23,7 @@ export function showCursor() {
 
 export function handleKeypress(
   handler: HandlekeypressHandler,
-  { storeKeypress = false, resetWindow = false }: HandlekeypressOptions
+  { storeKeypress = false, resetWindow = false, timeout }: HandlekeypressOptions
 ) {
   stdin.removeAllListeners("data");
   stdin.setEncoding("utf8");
@@ -31,9 +31,25 @@ export function handleKeypress(
 
   let keypressCount = 0;
   let storedKeypress = "";
+  let $keypress = "";
+
+  if (timeout) {
+    // set timeout
+    const timer = setTimeout(() => {
+      clearTimeout(timer);
+      handler({
+        storedKeypress,
+        keypress: $keypress,
+        keypressCount,
+        isTimeout: true,
+      });
+      process.removeAllListeners("data");
+    }, timeout);
+  }
 
   stdin.on("data", (keypress: string) => {
     keypressCount += 1;
+    $keypress = keypress;
 
     if (storeKeypress) {
       if (keypress === "\r") {
@@ -48,8 +64,9 @@ export function handleKeypress(
     if (resetWindow) resetTerminalWindow();
 
     if (keypress === "\u0003") {
+      showCursor();
       process.exit();
     }
-    handler({ storedKeypress, keypress, keypressCount });
+    handler({ storedKeypress, keypress, keypressCount, isTimeout: false });
   });
 }

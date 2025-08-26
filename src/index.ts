@@ -1,5 +1,5 @@
 import type { UpdateTargetFontColorArg } from "./@types";
-import { handleKeypress, hideCursor, write } from "./core/io";
+import { handleKeypress, hideCursor, showCursor, write } from "./core/io";
 import { applyTextStyle } from "./core/utils";
 import { styleFont, styleFontReset } from "./renderer/font";
 
@@ -33,8 +33,15 @@ export function updateStyledTextPrompt({
   return styledKeys.join(`\x1b`) + styleFontReset;
 }
 
+const progressStats = {
+  speed: 0,
+  accuracy: 0,
+  time: 0,
+  alignedSpeed: 0,
+};
+
 function $$game() {
-  const textPrompt = "Attack";
+  const textPrompt = "Attack the king";
 
   const textPromptLength = textPrompt.length;
 
@@ -50,7 +57,15 @@ function $$game() {
   hideCursor();
 
   handleKeypress(
-    ({ storedKeypress, keypress, keypressCount }) => {
+    ({ storedKeypress, keypress, keypressCount, isTimeout }) => {
+      if (isTimeout) {
+        console.log("timeout");
+        console.log("Typing Result");
+        console.log("mistakes: ", mistakes);
+        showCursor();
+        process.exit();
+      }
+
       const { match, fontPos, mistake } = matchKeypressToTextPromt(
         textPrompt,
         keypress,
@@ -73,15 +88,17 @@ function $$game() {
         if (storedKeypress === textPrompt) {
           console.log("\nyou win");
           console.log("mistakes: ", mistakes);
+          showCursor();
           process.exit();
         } else {
           console.log("\nCompleted");
           console.log("mistakes: ", mistakes);
+          showCursor();
           process.exit();
         }
       }
     },
-    { storeKeypress: true, resetWindow: true }
+    { storeKeypress: true, resetWindow: true, timeout: 5000 }
   );
 }
 
