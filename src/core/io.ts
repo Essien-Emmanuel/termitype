@@ -1,55 +1,55 @@
-import { stdin, stdout, exit as processExit } from "node:process";
-import readline from "readline/promises";
+import type { HandlekeypressHandler, HandlekeypressOptions } from "@/@types";
+import process from "process";
 
-const ac = new AbortController();
-const signal = ac.signal;
+const { stdin, stdout } = process;
 
-const rl = readline.createInterface({ input: stdin, output: stdout });
-
-export function clearScreen() {
-  stdout.write("\x1B[2J\x1B[0;0H");
+export function resetWindow() {
+  stdout.write("\u001b[1K" + `\u001b[1G`);
+  // \u001b[2K = clear line
+  // \u001b[1G = reset cursor to start of line
 }
 
-export function write(text: string = "") {
+export function write(text: string) {
   stdout.write(text);
 }
 
-export function writeLine(text: string = "") {
-  write(text + "\n");
+export function hideCursor() {
+  stdout.write("\x1B[?25l");
 }
 
-export function exit(message = "") {
-  if (message) writeLine(message);
-  stdin.removeAllListeners();
-  processExit();
+export function showCursor() {
+  stdout.write("\x1B[?25h");
 }
 
-export function initInput(onData: any) {
+export function handleKeypress(
+  handler: HandlekeypressHandler,
+  { storeKeypress = false }: HandlekeypressOptions
+) {
   stdin.removeAllListeners("data");
+  stdin.setEncoding("utf8");
   stdin.setRawMode(true);
-  stdin.setEncoding("utf-8");
-  stdin.resume();
-  stdin.on("data", onData);
-}
 
-export interface PromptInputOptions {
-  prompt: string;
-  timeout?: number;
-}
+  let keypressCount = 0;
+  let storedKeypress = "";
 
-export async function promptInput(onLine: any, options: PromptInputOptions) {
-  try {
-    if (options.timeout) {
-      setTimeout(() => ac.abort(), options.timeout);
-    }
+  stdin.on("data", (keypress: string) => {
+    keypressCount += 1;
 
-    const response = await rl.question(options.prompt, { signal });
-    onLine(response);
-  } catch (error: any) {
-    if (error.name === "AbortError") {
-      console.log("timeout");
+    if (storeKeypress) {
+      if (keypress === "\r") {
+        storedKeypress += "";
+      } else {
+        storedKeypress += keypress;
+      }
     } else {
-      console.log(error.message);
+      storedKeypress = keypress;
     }
-  }
+
+    resetWindow();
+
+    if (keypress === "\u0003") {
+      process.exit();
+    }
+    handler({ storedKeypress, keypress, keypressCount });
+  });
 }
