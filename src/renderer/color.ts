@@ -1,15 +1,13 @@
-export function bold(char: string) {
-  return `\x1b[1;37m${char}\x1b[0m`;
-}
+export const ansiColorCodes = {
+  black: 30,
+  red: 31,
+  green: 32,
+  yellow: 33,
+  blue: 34,
+  magenta: 35,
+  cyan: 36,
+  white: 37,
+  reset: 0,
+} as const;
 
-export function dim(char: string) {
-  return `\x1b[2;37m${char}\x1b[0m`;
-}
-
-export function greenify(char: string) {
-  return `\x1b[1;32m${char}\x1b[0m`;
-}
-
-export function redify(char: string) {
-  return `\x1b[1;31m${char}\x1b[0m`;
-}
+export type Color = keyof typeof ansiColorCodes;

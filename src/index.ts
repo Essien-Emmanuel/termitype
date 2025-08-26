@@ -1,7 +1,7 @@
 import type { UpdateTargetFontColorArg } from "./@types";
 import { handleKeypress, hideCursor, write } from "./core/io";
 import { applyTextStyle } from "./core/utils";
-import { bold, dim, redify } from "./renderer/color";
+import { styleFont, styleFontReset } from "./renderer/font";
 
 function matchKeypressToTextPromt(
   textPrompt: string,
@@ -14,28 +14,57 @@ function matchKeypressToTextPromt(
   return { match: true, fontPos: keypressCount, mistake: false };
 }
 
-export function updateTextPrompt({
+// export function _updateTextPrompt({
+//   fontPos,
+//   match,
+//   textPrompt,
+// }: UpdateTargetFontColorArg) {
+//   const targetfirstHalf = textPrompt.slice(0, fontPos - 1);
+//   const targetSecondHalf = textPrompt.slice(fontPos);
+//   const font = textPrompt[fontPos - 1];
+//   console.log("first ", targetfirstHalf, font, " ", targetSecondHalf);
+
+//   //   const colorizedFont = match
+//   //     ? styleFont({ font, mode: "bold" })
+//   //     : styleFont({ font, color: "red" });
+
+//   const colorizedFont = match ? `#${font}#` : `$${font}$`;
+
+//   return targetfirstHalf + colorizedFont + targetSecondHalf;
+// }
+
+export function updateStyledTextPrompt({
   fontPos,
   match,
   textPrompt,
 }: UpdateTargetFontColorArg) {
-  const targetfirstHalf = textPrompt.slice(0, fontPos - 1);
-  const targetSecondHalf = textPrompt.slice(fontPos);
-  const font = textPrompt[fontPos - 1];
+  const styledKeys = textPrompt.split(`\x1b`);
+  const lastStyledFont = styledKeys[fontPos];
 
-  const colorizedFont = match ? bold(textPrompt[fontPos - 1]) : redify(font);
+  const font = lastStyledFont[lastStyledFont.length - 1];
 
-  return targetfirstHalf + colorizedFont + targetSecondHalf;
+  const styledFont = match
+    ? styleFont({ font, mode: "bold" })
+    : styleFont({ font, color: "red" });
+
+  styledKeys[fontPos] = styledFont;
+
+  return styledKeys.join(`\x1b`) + styleFontReset;
 }
 
 function $$game() {
-  const textPrompt = "Attacking the Greatest Minds";
+  const textPrompt = "Attack";
+
   const textPromptLength = textPrompt.length;
 
   let mistakes = 0;
 
-  const styledTextPrompt = applyTextStyle(textPrompt, dim);
-  write(styledTextPrompt);
+  let styledTextPrompt = applyTextStyle({
+    text: textPrompt,
+    styleFn: styleFont,
+    styleFnConfig: { mode: "dim" },
+  });
+  write(styledTextPrompt + styleFontReset);
 
   hideCursor();
 
@@ -47,13 +76,16 @@ function $$game() {
         keypressCount
       );
 
-      const updatedTextPrompt = updateTextPrompt({
-        textPrompt,
+      const updatedTextPrompt = updateStyledTextPrompt({
+        textPrompt: styledTextPrompt,
         match,
         fontPos,
       });
 
+      console.log("result ", updatedTextPrompt);
       write(updatedTextPrompt);
+
+      styledTextPrompt = updatedTextPrompt;
 
       if (mistake) ++mistakes;
 
@@ -69,7 +101,7 @@ function $$game() {
         }
       }
     },
-    { storeKeypress: true }
+    { storeKeypress: true, resetWindow: true }
   );
 }
 

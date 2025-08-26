@@ -3,7 +3,7 @@ import process from "process";
 
 const { stdin, stdout } = process;
 
-export function resetWindow() {
+export function resetTerminalWindow() {
   stdout.write("\u001b[1K" + `\u001b[1G`);
   // \u001b[2K = clear line
   // \u001b[1G = reset cursor to start of line
@@ -23,7 +23,7 @@ export function showCursor() {
 
 export function handleKeypress(
   handler: HandlekeypressHandler,
-  { storeKeypress = false }: HandlekeypressOptions
+  { storeKeypress = false, resetWindow = false }: HandlekeypressOptions
 ) {
   stdin.removeAllListeners("data");
   stdin.setEncoding("utf8");
@@ -45,7 +45,7 @@ export function handleKeypress(
       storedKeypress = keypress;
     }
 
-    resetWindow();
+    if (resetWindow) resetTerminalWindow();
 
     if (keypress === "\u0003") {
       process.exit();
