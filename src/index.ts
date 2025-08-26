@@ -10,6 +10,22 @@ export function write(text: string) {
   stdout.write(text);
 }
 
+export function bold(char: string) {
+  return `\x1b[1;37m${char}\x1b[0m`;
+}
+
+export function dim(char: string) {
+  return `\x1b[2;37m${char}\x1b[0m`;
+}
+
+export function greenify(char: string) {
+  return `\x1b[1;32m${char}\x1b[0m`;
+}
+
+export function redify(char: string) {
+  return `\x1b[1;31m${char}\x1b[0m`;
+}
+
 export function hideCursor() {
   stdout.write("\x1B[?25l");
 }
@@ -32,11 +48,9 @@ function handleKeypress(
   stdin.setEncoding("utf8");
   stdin.setRawMode(true);
 
-  hideCursor();
-
   let storedKeypress = "";
 
-  console.log("type >  ", targetText);
+  //   console.log("type >  ", textPrompt);
   stdin.on("data", (keypress: string) => {
     keypressCount += 1;
 
@@ -52,8 +66,6 @@ function handleKeypress(
 
     resetWindow();
 
-    write(storedKeypress);
-
     if (keypress === "\u0003") {
       process.exit();
     }
@@ -61,35 +73,81 @@ function handleKeypress(
   });
 }
 
-const targetText = "Attacking the Greatest Minds";
-const targetTextLength = targetText.length;
+const textPrompt = "Attacking the Greatest Minds";
+const textPromptLength = textPrompt.length;
 let keypressCount = 0;
 let mistakes = 0;
 
 function matchKeypressToTarget(keypress: string) {
-  if (targetText[keypressCount - 1] !== keypress) {
+  if (textPrompt[keypressCount - 1] !== keypress) {
     ++mistakes;
+    return { match: false, fontPos: keypressCount };
   }
+  return { match: true, fontPos: keypressCount };
 }
 
-handleKeypress(
-  (storedKeypress, keypress) => {
-    matchKeypressToTarget(keypress);
+export type UpdateTargetFontColorArg = {
+  textPrompt: string;
+  fontPos: number;
+  match: boolean;
+};
 
-    if (keypressCount === targetTextLength) {
-      if (storedKeypress === targetText) {
-        console.log("\nyou win");
-        console.log("mistakes: ", mistakes);
-        process.exit();
-      } else {
-        console.log("\nCompleted");
-        console.log("mistakes: ", mistakes);
-        process.exit();
+export type ApplyTextStyleArg = (char: string) => string;
+
+export function applyTextStyle(text: string, sytleFn: ApplyTextStyleArg) {
+  const textArr = text.split("");
+  return textArr.reduce((acc, curr) => {
+    acc += sytleFn(curr);
+    return acc;
+  }, "");
+}
+
+export function updateTextPrompt({
+  fontPos,
+  match,
+  textPrompt,
+}: UpdateTargetFontColorArg) {
+  const targetfirstHalf = textPrompt.slice(0, fontPos - 1);
+  const targetSecondHalf = textPrompt.slice(fontPos);
+  const font = textPrompt[fontPos - 1];
+
+  const colorizedFont = match ? bold(textPrompt[fontPos - 1]) : redify(font);
+
+  return targetfirstHalf + colorizedFont + targetSecondHalf;
+}
+
+function game() {
+  const styledTextPrompt = applyTextStyle(textPrompt, dim);
+  write(styledTextPrompt);
+
+  hideCursor();
+
+  handleKeypress(
+    (storedKeypress, keypress) => {
+      const { match, fontPos } = matchKeypressToTarget(keypress);
+      const updatedTextPrompt = updateTextPrompt({
+        textPrompt,
+        match,
+        fontPos,
+      });
+      write(updatedTextPrompt);
+
+      if (keypressCount === textPromptLength) {
+        if (storedKeypress === textPrompt) {
+          console.log("\nyou win");
+          console.log("mistakes: ", mistakes);
+          process.exit();
+        } else {
+          console.log("\nCompleted");
+          console.log("mistakes: ", mistakes);
+          process.exit();
+        }
       }
-    }
-  },
-  { storeKeypress: true }
-);
+    },
+    { storeKeypress: true }
+  );
+}
+game();
 
 // handleKeypress(keypress => {
 //   if (keypress === "attack") {

@@ -1,10 +1,17 @@
-export function resetWindow(_colCount: number = 1) {
-  process.stdout.write("deleted");
-  //   process.stdout.write("\u001b[2K" + `\u001b[${colCount}G`);
-  //   process.stdout.write("\u001b[2K");
-  // \u001b[2K = clear line
-  // \u001b[1G = reset cursor to start of line
-  process.stdout.write("\rIn lagos");
+export function green(char: string = "green") {
+  return `\x1b[2;37m${char}\x1b[0m`;
 }
 
-resetWindow();
+const text = "this is a text";
+export type ApplyTextStyleArg = (char: string) => string;
+
+export function applyTextStyle(text: string, sytleFn: ApplyTextStyleArg) {
+  const textArr = text.split("");
+  return textArr.reduce((acc, curr) => {
+    acc += sytleFn(curr);
+    return acc;
+  }, "");
+}
+
+const t = applyTextStyle(text, green);
+console.log(t);
