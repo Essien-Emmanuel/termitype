@@ -1,105 +1,17 @@
-const { stdin, stdout } = process;
+import type { UpdateTargetFontColorArg } from "./@types";
+import { handleKeypress, hideCursor, write } from "./core/io";
+import { applyTextStyle } from "./core/utils";
+import { bold, dim, redify } from "./renderer/color";
 
-export function resetWindow() {
-  stdout.write("\u001b[1K" + `\u001b[1G`);
-  // \u001b[2K = clear line
-  // \u001b[1G = reset cursor to start of line
-}
-
-export function write(text: string) {
-  stdout.write(text);
-}
-
-export function bold(char: string) {
-  return `\x1b[1;37m${char}\x1b[0m`;
-}
-
-export function dim(char: string) {
-  return `\x1b[2;37m${char}\x1b[0m`;
-}
-
-export function greenify(char: string) {
-  return `\x1b[1;32m${char}\x1b[0m`;
-}
-
-export function redify(char: string) {
-  return `\x1b[1;31m${char}\x1b[0m`;
-}
-
-export function hideCursor() {
-  stdout.write("\x1B[?25l");
-}
-
-export function showCursor() {
-  stdout.write("\x1B[?25h");
-}
-
-export type HandlekeypressHandler = (
-  storedKeypress: string,
-  keypress: string
-) => void;
-export type HandlekeypressOptions = { storeKeypress: boolean };
-
-function handleKeypress(
-  handler: HandlekeypressHandler,
-  { storeKeypress = false }: HandlekeypressOptions
+function matchKeypressToTextPromt(
+  textPrompt: string,
+  keypress: string,
+  keypressCount: number
 ) {
-  stdin.removeAllListeners("data");
-  stdin.setEncoding("utf8");
-  stdin.setRawMode(true);
-
-  let storedKeypress = "";
-
-  //   console.log("type >  ", textPrompt);
-  stdin.on("data", (keypress: string) => {
-    keypressCount += 1;
-
-    if (storeKeypress) {
-      if (keypress === "\r") {
-        storedKeypress += "";
-      } else {
-        storedKeypress += keypress;
-      }
-    } else {
-      storedKeypress = keypress;
-    }
-
-    resetWindow();
-
-    if (keypress === "\u0003") {
-      process.exit();
-    }
-    handler(storedKeypress, keypress);
-  });
-}
-
-const textPrompt = "Attacking the Greatest Minds";
-const textPromptLength = textPrompt.length;
-let keypressCount = 0;
-let mistakes = 0;
-
-function matchKeypressToTarget(keypress: string) {
   if (textPrompt[keypressCount - 1] !== keypress) {
-    ++mistakes;
-    return { match: false, fontPos: keypressCount };
+    return { match: false, fontPos: keypressCount, mistake: true };
   }
-  return { match: true, fontPos: keypressCount };
-}
-
-export type UpdateTargetFontColorArg = {
-  textPrompt: string;
-  fontPos: number;
-  match: boolean;
-};
-
-export type ApplyTextStyleArg = (char: string) => string;
-
-export function applyTextStyle(text: string, sytleFn: ApplyTextStyleArg) {
-  const textArr = text.split("");
-  return textArr.reduce((acc, curr) => {
-    acc += sytleFn(curr);
-    return acc;
-  }, "");
+  return { match: true, fontPos: keypressCount, mistake: false };
 }
 
 export function updateTextPrompt({
@@ -116,21 +28,34 @@ export function updateTextPrompt({
   return targetfirstHalf + colorizedFont + targetSecondHalf;
 }
 
-function game() {
+function $$game() {
+  const textPrompt = "Attacking the Greatest Minds";
+  const textPromptLength = textPrompt.length;
+
+  let mistakes = 0;
+
   const styledTextPrompt = applyTextStyle(textPrompt, dim);
   write(styledTextPrompt);
 
   hideCursor();
 
   handleKeypress(
-    (storedKeypress, keypress) => {
-      const { match, fontPos } = matchKeypressToTarget(keypress);
+    ({ storedKeypress, keypress, keypressCount }) => {
+      const { match, fontPos, mistake } = matchKeypressToTextPromt(
+        textPrompt,
+        keypress,
+        keypressCount
+      );
+
       const updatedTextPrompt = updateTextPrompt({
         textPrompt,
         match,
         fontPos,
       });
+
       write(updatedTextPrompt);
+
+      if (mistake) ++mistakes;
 
       if (keypressCount === textPromptLength) {
         if (storedKeypress === textPrompt) {
@@ -147,7 +72,8 @@ function game() {
     { storeKeypress: true }
   );
 }
-game();
+
+$$game();
 
 // handleKeypress(keypress => {
 //   if (keypress === "attack") {
