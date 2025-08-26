@@ -17,7 +17,7 @@ export const styleFontReset = `\x1b[${ansiFontModes.reset}m`;
 
 export function styleFont(config: StyleFontConfig) {
   const { font, mode = "bold", color = "white" } = config;
-  const hexEsc = `\\x1b`;
+  const hexEsc = `\x1b`;
 
   return `${hexEsc}[${ansiFontModes[mode]};${ansiColorCodes[color]}m${font}`;
 }

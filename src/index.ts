@@ -14,25 +14,6 @@ function matchKeypressToTextPromt(
   return { match: true, fontPos: keypressCount, mistake: false };
 }
 
-// export function _updateTextPrompt({
-//   fontPos,
-//   match,
-//   textPrompt,
-// }: UpdateTargetFontColorArg) {
-//   const targetfirstHalf = textPrompt.slice(0, fontPos - 1);
-//   const targetSecondHalf = textPrompt.slice(fontPos);
-//   const font = textPrompt[fontPos - 1];
-//   console.log("first ", targetfirstHalf, font, " ", targetSecondHalf);
-
-//   //   const colorizedFont = match
-//   //     ? styleFont({ font, mode: "bold" })
-//   //     : styleFont({ font, color: "red" });
-
-//   const colorizedFont = match ? `#${font}#` : `$${font}$`;
-
-//   return targetfirstHalf + colorizedFont + targetSecondHalf;
-// }
-
 export function updateStyledTextPrompt({
   fontPos,
   match,
@@ -44,8 +25,8 @@ export function updateStyledTextPrompt({
   const font = lastStyledFont[lastStyledFont.length - 1];
 
   const styledFont = match
-    ? styleFont({ font, mode: "bold" })
-    : styleFont({ font, color: "red" });
+    ? styleFont({ font, mode: "bold" }).split("\x1b").slice(1).join("\x1b")
+    : styleFont({ font, color: "red" }).split("\x1b").slice(1).join("\x1b");
 
   styledKeys[fontPos] = styledFont;
 
@@ -82,7 +63,6 @@ function $$game() {
         fontPos,
       });
 
-      console.log("result ", updatedTextPrompt);
       write(updatedTextPrompt);
 
       styledTextPrompt = updatedTextPrompt;
