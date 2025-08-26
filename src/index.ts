@@ -3,11 +3,23 @@ import { handleKeypress, hideCursor, showCursor, write } from "./core/io";
 import { applyTextStyle } from "./core/utils";
 import { styleFont, styleFontReset } from "./renderer/font";
 
+export function checkSpace(keypress: string) {
+  console.log(keypress);
+  if (keypress === "\u0020") {
+    console.log("is space bar");
+  }
+}
+
+// check textPrompt[keypressCount - 1] is space
+// if space go back one step and count the chars, that is the word
+// user this word for the number of chars in a timeout to calculate speed and accuracy and consistency
+
 function matchKeypressToTextPromt(
   textPrompt: string,
   keypress: string,
   keypressCount: number
 ) {
+  checkSpace(keypress);
   if (textPrompt[keypressCount - 1] !== keypress) {
     return { match: false, fontPos: keypressCount, mistake: true };
   }
@@ -98,7 +110,7 @@ function $$game() {
         }
       }
     },
-    { storeKeypress: true, resetWindow: true, timeout: 5000 }
+    { storeKeypress: true, resetWindow: true }
   );
 }
 
