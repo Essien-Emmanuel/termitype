@@ -6,6 +6,7 @@ export type UpdateTargetFontColorArg = {
   textPrompt: string;
   fontPos: number;
   match: boolean;
+  isBackspace: boolean;
 };
 
 export type ApplyTextStyleConfig = {
