@@ -3,10 +3,12 @@ import process from "process";
 
 const { stdin, stdout } = process;
 
-export function resetTerminalWindow() {
-  stdout.write("\u001b[1K" + `\u001b[1G`);
-  // \u001b[2K = clear line
-  // \u001b[1G = reset cursor to start of line
+export function resetTerminalWindow(lines: number = 2) {
+  const rows = process.stdout.rows - lines;
+  process.stdout.write(`\x1b[${rows};0H\n`);
+}
+export function positionTerminalCursor(cursorPos: number = 1) {
+  process.stdout.write(`\x1b[10;${cursorPos}f`);
 }
 
 export function write(text: string) {
@@ -23,7 +25,12 @@ export function showCursor() {
 
 export function handleKeypress(
   handler: HandlekeypressHandler,
-  { storeKeypress = false, resetWindow = false, timeout }: HandlekeypressOptions
+  {
+    storeKeypress = false,
+    resetWindow = false,
+    timeout,
+    textPromptRows,
+  }: HandlekeypressOptions
 ) {
   stdin.removeAllListeners("data");
   stdin.setEncoding("utf8");
@@ -67,10 +74,12 @@ export function handleKeypress(
       isBackspaceKeypress = true;
     }
 
-    if (resetWindow) resetTerminalWindow();
+    if (resetWindow) {
+      resetTerminalWindow(textPromptRows);
+    }
 
     if (keypress === "\u0003") {
-      showCursor();
+      // showCursor();
       process.exit();
     }
 
