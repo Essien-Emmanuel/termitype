@@ -197,7 +197,7 @@ function $$game() {
       // log to screen
       write(updatedTextPrompt);
 
-      // positionTerminalCursor(promptCharPos);
+      positionTerminalCursor(promptCharPos);
 
       // update prompt before next print
       styledTextPrompt = updatedTextPrompt;
@@ -225,6 +225,7 @@ function $$game() {
       }
 
       if (isTimeout) {
+        process.stdout.write(`\x1b[${textPromptRows + 1};1H`);
         const accuracy = calculateAccuracy(correctCharCount, textPromptLength);
         const wpm = calculateWpm(promptCharPos, mistakes, elapsedTime);
 

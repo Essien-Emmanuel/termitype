@@ -8,7 +8,7 @@ export function resetTerminalWindow(lines: number = 2) {
   process.stdout.write(`\x1b[${rows};0H\n`);
 }
 export function positionTerminalCursor(cursorPos: number = 1) {
-  process.stdout.write(`\x1b[10;${cursorPos}f`);
+  process.stdout.write(`\x1b[1;${cursorPos}f`);
 }
 
 export function write(text: string) {
@@ -79,7 +79,7 @@ export function handleKeypress(
     }
 
     if (keypress === "\u0003") {
-      // showCursor();
+      showCursor();
       process.exit();
     }
 
