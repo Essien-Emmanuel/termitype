@@ -1,5 +1,12 @@
 import type { UpdateTargetFontColorArg } from "./@types";
-import { handleKeypress, hideCursor, showCursor, write } from "./core/io";
+import {
+  handleKeypress,
+  hideCursor,
+  positionTerminalCursor,
+  resetTerminalWindow,
+  showCursor,
+  write,
+} from "./core/io";
 import { applyTextStyle } from "./core/utils";
 import { styleFont, styleFontReset } from "./renderer/font";
 
@@ -126,9 +133,12 @@ export function showStats(playerStat: PlayerStat) {
 }
 
 function $$game() {
-  const textPrompt = "Attack";
-  // const textPrompt =
-  //   "To keep the width at 300px, no matter the amount of padding,"; //you can use the box-sizing property This causes the element to maintain its actual width; if you increase the padding, the available content space will decrease.";
+  process.stdout.write("\x1b[2J\n");
+  process.stdout.write("\x1b[1;1H");
+
+  // const textPrompt = "Attack";
+  const textPrompt =
+    "To keep the width at 300px, no matter the amount of padding, you can use the box-sizing property This causes the element to maintain its actual width; if you increase the padding, the available content space will decrease.To keep the width at 300px, no matter the amount of padding, you can use the box-sizing property This causes the element to maintain its actual width; if you increase the padding, the available content space will decrease";
 
   const textPromptLength = textPrompt.length;
   const timeout = 1000 * 30;
@@ -146,11 +156,12 @@ function $$game() {
 
   const prevTime = Date.now();
 
-  hideCursor();
+  // hideCursor();
   let promptCharPos = 0;
-
+  const textPromptRows = Math.ceil(textPrompt.length / process.stdout.columns);
   handleKeypress(
     ({ storedKeypress, keypress, isTimeout, isBackspaceKeypress }) => {
+      process.stdout.write("\x1b[1;1H");
       const currentTime = Date.now();
       const elapsedTime = currentTime - prevTime;
 
@@ -186,6 +197,8 @@ function $$game() {
       // log to screen
       write(updatedTextPrompt);
 
+      // positionTerminalCursor(promptCharPos);
+
       // update prompt before next print
       styledTextPrompt = updatedTextPrompt;
 
@@ -220,7 +233,7 @@ function $$game() {
         process.exit();
       }
     },
-    { storeKeypress: true, resetWindow: true, timeout }
+    { storeKeypress: true, resetWindow: true, timeout, textPromptRows }
   );
 }
 
