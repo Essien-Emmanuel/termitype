@@ -19,6 +19,7 @@ export type HandlekeypressHandlerArg = {
   keypress: string;
   keypressCount: number;
   isTimeout: boolean;
+  isBackspaceKeypress: boolean;
 };
 
 export type HandlekeypressHandler = (args: HandlekeypressHandlerArg) => void;

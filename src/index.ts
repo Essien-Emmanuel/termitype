@@ -57,10 +57,10 @@ export function calculateWpm(
 }
 
 export function calculateAccuracy(
-  noOfCorrectChar: number,
+  correctCharCount: number,
   totalPromptLength: number
 ) {
-  return (noOfCorrectChar / totalPromptLength) * 100;
+  return (correctCharCount / totalPromptLength) * 100;
 }
 export type PlayerStat = {
   wpm: number;
@@ -80,15 +80,15 @@ export function showStats(playerStat: PlayerStat) {
 }
 
 function $$game() {
-  // const textPrompt = "Attack the king";
-  const textPrompt =
-    "To keep the width at 300px, no matter the amount of padding, you can use the box-sizing property This causes the element to maintain its actual width; if you increase the padding, the available content space will decrease.";
+  const textPrompt = "Attack";
+  // const textPrompt =
+  //   "To keep the width at 300px, no matter the amount of padding,"; //you can use the box-sizing property This causes the element to maintain its actual width; if you increase the padding, the available content space will decrease.";
 
   const textPromptLength = textPrompt.length;
   const timeout = 1000 * 30;
 
   let mistakes = 0;
-  let noOfcorrectChar = 0;
+  let correctCharCount = 0;
 
   let styledTextPrompt = applyTextStyle({
     text: textPrompt,
@@ -100,14 +100,33 @@ function $$game() {
   const prevTime = Date.now();
 
   hideCursor();
+  let promptCharPos = 0;
 
   handleKeypress(
-    ({ storedKeypress, keypress, keypressCount, isTimeout }) => {
+    ({
+      storedKeypress,
+      keypress,
+      isTimeout,
+      keypressCount,
+      isBackspaceKeypress,
+    }) => {
       const currentTime = Date.now();
       const elapsedTime = currentTime - prevTime;
 
+      // if (isBackspaceKeypress) {
+      //   if (promptCharPos > 0) {
+      //     --promptCharPos;
+      //   }
+
+      //   if (mistakes > 0) {
+      //     --mistakes;
+      //   }
+      // } else {
+      //   ++promptCharPos;
+      // }
+
       if (isTimeout) {
-        const accuracy = calculateAccuracy(noOfcorrectChar, textPromptLength);
+        const accuracy = calculateAccuracy(correctCharCount, textPromptLength);
         const wpm = calculateWpm(keypressCount, mistakes, elapsedTime);
 
         showStats({ accuracy, timeout: elapsedTime, mistakes, wpm });
@@ -134,7 +153,7 @@ function $$game() {
       if (mistake) {
         ++mistakes;
       } else {
-        ++noOfcorrectChar;
+        ++correctCharCount;
       }
 
       if (keypressCount === textPromptLength) {
@@ -143,7 +162,7 @@ function $$game() {
         } else {
           console.log("\nCompleted");
         }
-        const accuracy = calculateAccuracy(noOfcorrectChar, textPromptLength);
+        const accuracy = calculateAccuracy(correctCharCount, textPromptLength);
         const wpm = calculateWpm(keypressCount, mistakes, elapsedTime);
 
         showStats({ accuracy, timeout: elapsedTime, mistakes, wpm });
@@ -151,7 +170,7 @@ function $$game() {
         process.exit();
       }
     },
-    { storeKeypress: true, resetWindow: true, timeout }
+    { storeKeypress: true, resetWindow: true }
   );
 }
 

@@ -1,12 +1,18 @@
 import { hideCursor, showCursor } from "@/core/io";
 
 function resetWindowAndLoad(text: string) {
-  process.stdout.write("\u001b[2K" + "\u001b[1G");
-
+  //   process.stdout.write(
+  //     "\u001b[2K" + "\u001b[1G" + `\x1b[${process.stdout.rows};1H`
+  //   );
+  process.stdout.write("\x1b[1000D");
   process.stdout.write(text);
+  showCursor();
 }
 
-hideCursor();
+// hideCursor();
+
+console.log(process.stdout.rows);
+console.log("Loading");
 
 let bar = "";
 const interval = setInterval(() => {
@@ -16,5 +22,5 @@ const interval = setInterval(() => {
 
 setTimeout(() => {
   clearInterval(interval);
-  showCursor();
-}, 6000);
+  //   showCursor();
+}, 10000);

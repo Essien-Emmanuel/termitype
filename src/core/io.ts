@@ -42,13 +42,15 @@ export function handleKeypress(
         keypress: $keypress,
         keypressCount,
         isTimeout: true,
+        isBackspaceKeypress: false,
       });
       process.removeAllListeners("data");
     }, timeout);
   }
 
   stdin.on("data", (keypress: string) => {
-    keypressCount += 1;
+    let isBackspaceKeypress = false;
+    ++keypressCount;
     $keypress = keypress;
 
     if (storeKeypress) {
@@ -61,12 +63,23 @@ export function handleKeypress(
       storedKeypress = keypress;
     }
 
+    if (keypress === "\u0008") {
+      isBackspaceKeypress = true;
+    }
+
     if (resetWindow) resetTerminalWindow();
 
     if (keypress === "\u0003") {
       showCursor();
       process.exit();
     }
-    handler({ storedKeypress, keypress, keypressCount, isTimeout: false });
+
+    handler({
+      storedKeypress,
+      keypress,
+      keypressCount,
+      isTimeout: false,
+      isBackspaceKeypress,
+    });
   });
 }
