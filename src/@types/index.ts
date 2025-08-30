@@ -18,6 +18,8 @@ export type HandlekeypressHandlerArg = {
   storedKeypress: string;
   keypress: string;
   keypressCount: number;
+  isTimeout: boolean;
+  isBackspaceKeypress: boolean;
 };
 
 export type HandlekeypressHandler = (args: HandlekeypressHandlerArg) => void;
@@ -25,6 +27,7 @@ export type HandlekeypressHandler = (args: HandlekeypressHandlerArg) => void;
 export type HandlekeypressOptions = {
   storeKeypress?: boolean;
   resetWindow?: boolean;
+  timeout?: number;
 };
 
 export type FontMode = keyof typeof ansiFontModes;
