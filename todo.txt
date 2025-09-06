@@ -1,1 +1,5 @@
-calculate stats - speed and accuracy
+calculate stats - speed and accuracy #checked
+read files from json as textprompts
+read txt files from local machine
+save/clear progress
+gameloop

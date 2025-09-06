@@ -1,9 +1,13 @@
+import path from "path";
+
+const __dirname = import.meta.dirname;
+
 import type { UpdateTargetFontColorArg } from "./@types";
 import {
   handleKeypress,
-  hideCursor,
   positionTerminalCursor,
-  resetTerminalWindow,
+  readFile,
+  setCursorPos,
   showCursor,
   write,
 } from "./core/io";
@@ -132,19 +136,56 @@ export function showStats(playerStat: PlayerStat) {
   console.log("mistakes: " + mistakes);
 }
 
-function $$game() {
-  process.stdout.write("\x1b[2J\n");
-  process.stdout.write("\x1b[1;1H");
+function moveDownBy(lines: number) {
+  process.stdout.write(`\x1b[${lines};1H`);
+}
 
-  // const textPrompt = "Attack";
-  const textPrompt =
-    "To keep the width at 300px, no matter the amount of padding, you can use the box-sizing property This causes the element to maintain its actual width; if you increase the padding, the available content space will decrease.To keep the width at 300px, no matter the amount of padding, you can use the box-sizing property This causes the element to maintain its actual width; if you increase the padding, the available content space will decrease";
+function clearEntireScreen() {
+  process.stdout.write("\x1b[2J\n");
+}
+
+export async function readPrompts(filename: string) {
+  try {
+    const fp = path.join(__dirname, `prompts/${filename}.txt`);
+    const data = await readFile(fp);
+
+    return data;
+  } catch (error) {
+    console.error(error);
+    return null;
+  }
+}
+
+export async function $$game() {
+  clearEntireScreen();
+  // set cursor position
+  moveDownBy(1);
+
+  const rawTextPrompt = await readPrompts("lorem");
+
+  if (!rawTextPrompt) {
+    process.stdout.write(
+      "\x1b[1;34mThere is no practice available for now\x1b[0m\n"
+    );
+    process.exit();
+  }
+
+  const maxTerminalCharLength =
+    (process.stdout.rows - 2) * process.stdout.columns;
+
+  const textPrompt = rawTextPrompt
+    .replace(/\s\s+/g, " ")
+    .slice(0, maxTerminalCharLength - 1);
 
   const textPromptLength = textPrompt.length;
   const timeout = 1000 * 30;
 
   let mistakes = 0;
   let correctCharCount = 0;
+  let promptCharPos = 0;
+  const prevTime = Date.now();
+
+  const textPromptRows = Math.ceil(textPromptLength / process.stdout.columns);
 
   let styledTextPrompt =
     applyTextStyle({
@@ -152,16 +193,16 @@ function $$game() {
       styleFn: styleFont,
       styleFnConfig: { mode: "dim" },
     }) + styleFontReset;
-  write(styledTextPrompt);
 
-  const prevTime = Date.now();
+  write(styledTextPrompt);
+  positionTerminalCursor(promptCharPos + 1);
 
   // hideCursor();
-  let promptCharPos = 0;
-  const textPromptRows = Math.ceil(textPrompt.length / process.stdout.columns);
+
   handleKeypress(
     ({ storedKeypress, keypress, isTimeout, isBackspaceKeypress }) => {
-      process.stdout.write("\x1b[1;1H");
+      setCursorPos();
+
       const currentTime = Date.now();
       const elapsedTime = currentTime - prevTime;
 
@@ -197,7 +238,7 @@ function $$game() {
       // log to screen
       write(updatedTextPrompt);
 
-      positionTerminalCursor(promptCharPos);
+      positionTerminalCursor(promptCharPos + 1);
 
       // update prompt before next print
       styledTextPrompt = updatedTextPrompt;
@@ -225,7 +266,7 @@ function $$game() {
       }
 
       if (isTimeout) {
-        process.stdout.write(`\x1b[${textPromptRows + 1};1H`);
+        moveDownBy(textPromptRows + 1);
         const accuracy = calculateAccuracy(correctCharCount, textPromptLength);
         const wpm = calculateWpm(promptCharPos, mistakes, elapsedTime);
 
