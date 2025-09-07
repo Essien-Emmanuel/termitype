@@ -1,5 +1,6 @@
-import type { HandlekeypressHandler, HandlekeypressOptions } from "@/@types";
 import process from "process";
+import fs from "fs/promises";
+import type { HandlekeypressHandler, HandlekeypressOptions } from "@/@types";
 
 const { stdin, stdout } = process;
 
@@ -8,7 +9,11 @@ export function resetTerminalWindow(lines: number = 2) {
   process.stdout.write(`\x1b[${rows};0H\n`);
 }
 export function positionTerminalCursor(cursorPos: number = 1) {
-  process.stdout.write(`\x1b[10;${cursorPos}f`);
+  process.stdout.write(`\x1b[1;${cursorPos}f`);
+}
+
+export function setCursorPos(row: number = 1, col: number = 1) {
+  process.stdout.write(`\x1b[${row};${col}H`);
 }
 
 export function write(text: string) {
@@ -79,7 +84,7 @@ export function handleKeypress(
     }
 
     if (keypress === "\u0003") {
-      // showCursor();
+      showCursor();
       process.exit();
     }
 
@@ -92,3 +97,14 @@ export function handleKeypress(
     });
   });
 }
+
+export async function readFile(filePath: string) {
+  try {
+    const data = await fs.readFile(filePath);
+    return data.toString();
+  } catch (error) {
+    return null;
+  }
+}
+
+export function selectTxtFileFromLocalSys() {}

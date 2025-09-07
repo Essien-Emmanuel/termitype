@@ -1,60 +1,176 @@
 const { stdin, stdout } = process;
 
-function reloadWindow(lines: number = 2) {
-  process.stdout.write(`\x1b[${process.stdout.rows - lines};0H\x1b[1000D`);
-  // process.stdout.write("\x1b[1000D\x1b[2A");
-  // process.stdout.write(`\x1b[s`);
-}
-
-console.log("initializing");
-function handleInput(handler: any, textPromptRows: number) {
+function handleKey(handler: any) {
   stdin.removeAllListeners("data");
   stdin.setRawMode(true);
   stdin.setEncoding("utf-8");
 
-  let storedKeypress = "";
-  let mistakeCorrectCount = 0;
-  let keypressCount = 0;
-
   stdin.on("data", (key: string) => {
-    storedKeypress += key;
-
-    if (key === "\u0003") {
-      process.exit();
-    }
-
-    if (key === "\u0008") {
-      console.log("back space");
-    }
-
-    ++keypressCount;
-
-    reloadWindow(2);
-
-    handler(key, storedKeypress, mistakeCorrectCount);
-    --mistakeCorrectCount;
+    handler(key);
   });
 }
-console.log(process.stdout.columns);
 
-function run() {
-  const textPrompt =
-    "To keep the width at 300px, no matter the amount of padding, you can use the box-sizing property This causes the element to maintain its actual width; if you increase the padding, the available content space will decrease.";
-  const textPromptRows = Math.ceil(textPrompt.length / 156);
-  let cursorpos = 0;
-  handleInput(
-    (input: string, storedKeypress: string, mistakeCorrectCount: number) => {
-      process.stdout.write(textPrompt);
-      process.stdout.write(`\x1b[8;${2}f`);
-      if (storedKeypress === "attack") {
-        console.log("hit");
-      }
-    },
-    textPromptRows
-  );
+class Scene {
+  init() {}
+  update(key: string): { nextScene: string } {
+    return { nextScene: "" };
+  }
+
+  render() {}
+}
+type SceneCtor = new () => Scene;
+
+class SceneManager {
+  private registry: Map<string, SceneCtor>;
+  public currentScene: Scene | null;
+  constructor() {
+    this.registry = new Map<string, SceneCtor>();
+    this.currentScene = null;
+  }
+
+  register({ name, scene }: { name: string; scene: SceneCtor }) {
+    const isKey = this.registry.has(name);
+    if (!isKey) {
+      this.registry.set(name, scene);
+    }
+    return this;
+  }
+
+  load(sceneName: string) {
+    const isKey = this.registry.has(sceneName);
+    if (!isKey) return;
+
+    const sceneCtor = this.registry.get(sceneName)!;
+    const scene = new sceneCtor();
+    scene.init();
+    this.currentScene = scene;
+  }
 }
 
-run();
-console.log(process.stdout.rows);
-// process.stdout.write("helao");
-// process.stdout.write("hela\bo");
+class TitleScene {
+  init() {
+    console.log("loading title...");
+  }
+
+  update(key: string): { nextScene: string } {
+    if (key === "n") {
+      return { nextScene: "game" };
+    }
+    return { nextScene: "" };
+  }
+
+  render() {
+    console.log("Title Scene");
+  }
+}
+
+class ResultScene {
+  init() {
+    console.log("loading result...");
+  }
+  update(key: string): { nextScene: string } {
+    if (key === "\u0003") {
+      console.log("GameEnds");
+      process.exit();
+    }
+    return { nextScene: "" };
+  }
+
+  render() {
+    console.log("Result Scene");
+  }
+}
+
+class GameScene {
+  public storedKeypress: string;
+  public keypressCount: number;
+
+  constructor() {
+    this.storedKeypress = "";
+    this.keypressCount = 0;
+  }
+
+  init() {
+    console.log("initializing game...");
+  }
+
+  update(key: string): { nextScene: string } {
+    this.storedKeypress += key;
+    ++this.keypressCount;
+
+    if (this.storedKeypress === "attack") {
+      console.log("hit");
+      return { nextScene: "result" };
+    }
+
+    return { nextScene: "" };
+  }
+
+  render() {
+    console.log("stored keypress ", this.storedKeypress);
+    console.log("Game Scene");
+  }
+}
+
+const game = new GameScene();
+
+class Engine {
+  public running: boolean;
+  public key: string | null;
+  public sceneManager: SceneManager;
+
+  constructor() {
+    this.sceneManager = new SceneManager();
+    this.running = false;
+    this.key = null;
+  }
+
+  private async processInput() {
+    await new Promise((resolve) => {
+      handleKey((key: string) => {
+        this.key = key;
+        if (key) return resolve(null);
+      });
+    });
+  }
+
+  private update() {
+    if (this.key) {
+      const currentScene = this.sceneManager.currentScene;
+      if (currentScene) {
+        const result = this.sceneManager.currentScene?.update(this.key);
+        if (result) {
+          this.sceneManager.load(result?.nextScene);
+        }
+      }
+    }
+    return;
+  }
+
+  async loop() {
+    while (this.running) {
+      await this.processInput();
+      this.update();
+
+      // render scene
+      this.sceneManager.currentScene?.render();
+    }
+  }
+
+  run(initialSceneName: string) {
+    this.running = true;
+    this.sceneManager.load(initialSceneName);
+    this.loop();
+  }
+
+  stop() {
+    this.running = false;
+  }
+}
+
+const engine = new Engine();
+engine.sceneManager
+  .register({ name: "title", scene: TitleScene })
+  .register({ name: "game", scene: GameScene })
+  .register({ name: "result", scene: ResultScene });
+engine.run("title");
