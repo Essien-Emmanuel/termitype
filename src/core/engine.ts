@@ -1,4 +1,5 @@
 import { SceneManager } from "./scene-manager";
+import { handleKey } from "./io";
 
 export class Engine {
   public running: boolean;
@@ -21,25 +22,25 @@ export class Engine {
   }
 
   private update() {
-    if (this.key) {
-      const currentScene = this.sceneManager.currentScene;
-      if (currentScene) {
-        const result = this.sceneManager.currentScene?.update(this.key);
-        if (result) {
-          this.sceneManager.load(result?.nextScene);
-        }
-      }
-    }
-    return;
+    const currentScene = this.sceneManager.currentScene;
+    if (!this.key || !currentScene) return;
+
+    const result = this.sceneManager.currentScene?.update(this.key);
+
+    return result;
   }
 
   async loop() {
     while (this.running) {
       await this.processInput();
-      this.update();
+      const result = this.update();
 
       // render scene
       this.sceneManager.currentScene?.render();
+
+      if (result) {
+        this.sceneManager.load(result?.nextScene);
+      }
     }
   }
 

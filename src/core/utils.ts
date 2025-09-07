@@ -9,3 +9,24 @@ export function applyTextStyle(config: ApplyTextStyleConfig) {
     return acc;
   }, "");
 }
+
+export function checkSpacebar(keypress: string) {
+  if (keypress !== "\u0020") {
+    return false;
+  }
+  return true;
+}
+export function checkBackspace(keypress: string) {
+  if (keypress !== "\u0008") {
+    return false;
+  }
+  return true;
+}
+
+export async function delay(ms: number = 3000) {
+  await new Promise((resolve) => {
+    setTimeout(() => {
+      return resolve(null);
+    }, ms);
+  });
+}

@@ -1,6 +1,6 @@
 export class Scene {
   init() {}
-  update(key: string): { nextScene: string } {
+  async update(key: string): Promise<{ nextScene: string }> {
     return { nextScene: "" };
   }
 

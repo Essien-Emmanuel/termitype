@@ -135,14 +135,11 @@ class Engine {
   }
 
   private update() {
-    if (this.key) {
-      const currentScene = this.sceneManager.currentScene;
-      if (currentScene) {
-        const result = this.sceneManager.currentScene?.update(this.key);
-        if (result) {
-          this.sceneManager.load(result?.nextScene);
-        }
-      }
+    const currentScene = this.sceneManager.currentScene;
+    if (!this.key || !currentScene) return;
+    const result = this.sceneManager.currentScene?.update(this.key);
+    if (result) {
+      this.sceneManager.load(result?.nextScene);
     }
     return;
   }
