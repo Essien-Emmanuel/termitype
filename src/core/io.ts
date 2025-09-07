@@ -28,6 +28,14 @@ export function showCursor() {
   stdout.write("\x1B[?25h");
 }
 
+export function moveDownBy(lines: number) {
+  process.stdout.write(`\x1b[${lines};1H`);
+}
+
+export function clearEntireScreen() {
+  process.stdout.write("\x1b[2J\n");
+}
+
 export function handleKeypress(
   handler: HandlekeypressHandler,
   {
@@ -98,10 +106,30 @@ export function handleKeypress(
   });
 }
 
+export function handleKey(handler: any) {
+  stdin.removeAllListeners("data");
+  stdin.setRawMode(true);
+  stdin.setEncoding("utf-8");
+
+  stdin.on("data", (key: string) => {
+    handler(key);
+  });
+}
+
 export async function readFile(filePath: string) {
   try {
     const data = await fs.readFile(filePath);
     return data.toString();
+  } catch (error) {
+    return null;
+  }
+}
+
+export async function writeFile(filePath: string, data: Record<string, any>) {
+  try {
+    const stringifiedData = JSON.stringify(data);
+    await fs.writeFile(filePath, stringifiedData);
+    return true;
   } catch (error) {
     return null;
   }

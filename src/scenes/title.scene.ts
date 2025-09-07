@@ -3,7 +3,7 @@ export class TitleScene {
     console.log("loading title...");
   }
 
-  update(key: string): { nextScene: string } {
+  async update(key: string): Promise<{ nextScene: string }> {
     if (key === "n") {
       return { nextScene: "game" };
     }
