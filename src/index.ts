@@ -161,7 +161,7 @@ export async function $$game() {
   // set cursor position
   moveDownBy(1);
 
-  const rawTextPrompt = await readPrompts("lorem");
+  const rawTextPrompt = await readPrompts("test");
 
   if (!rawTextPrompt) {
     process.stdout.write(

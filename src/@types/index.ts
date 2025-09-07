@@ -35,3 +35,9 @@ export type HandlekeypressOptions = {
 export type FontMode = keyof typeof ansiFontModes;
 
 export type StyleFontConfig = { font: string; color?: Color; mode?: FontMode };
+
+export type SceneCtor = new () => Scene;
+
+export type SceneManagerRegistry = Map<string, SceneCtor>;
+
+export type SceneManagerRegisterArg = { name: string; scene: SceneCtor };
