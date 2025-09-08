@@ -1,9 +1,9 @@
-import { applyTextStyle, readPrompts } from "./utils.game";
+import { applyTextStyle, readGameFile } from "./utils.game";
 import { styleFont, styleFontReset } from "@/renderer/font";
 import { positionTerminalCursor, write } from "@/core/io";
 
 export async function initializeGame() {
-  const rawTextPrompt = await readPrompts("t");
+  const rawTextPrompt = await readGameFile("prompts/t.txt");
 
   if (!rawTextPrompt) {
     process.stdout.write(

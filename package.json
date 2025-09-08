@@ -4,7 +4,7 @@
   "main": "index.js",
   "type": "module",
   "scripts": {
-    "game": "tsx ./src/index.ts"
+    "game": "tsx ./src/main.ts"
   },
   "keywords": [],
   "author": "",

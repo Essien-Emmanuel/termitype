@@ -21,19 +21,22 @@ export class Engine {
     });
   }
 
-  private update() {
+  private async update() {
     const currentScene = this.sceneManager.currentScene;
     if (!this.key || !currentScene) return;
 
-    const result = this.sceneManager.currentScene?.update(this.key);
+    const result = await this.sceneManager.currentScene?.update(this.key);
 
     return result;
   }
 
   async loop() {
     while (this.running) {
+      // handle input
       await this.processInput();
-      const result = this.update();
+
+      // update
+      const result = await this.update();
 
       // render scene
       this.sceneManager.currentScene?.render();

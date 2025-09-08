@@ -6,7 +6,6 @@ import {
   setCursorPos,
   showCursor,
   write,
-  writeFile,
 } from "@/core/io";
 import { delay } from "@/core/utils";
 import { initializeGame } from "@/game/init";
@@ -15,6 +14,7 @@ import {
   matchKeypressToTextPromt,
   showStats,
   updateStyledTextPrompt,
+  writeToFile,
 } from "@/game/utils.game";
 
 export class GameScene {
@@ -80,6 +80,7 @@ export class GameScene {
     this.storedKeypress += key;
     this.keypress = key;
     ++this.keypressCount;
+    this.isBackspaceKeypress = false;
 
     if (key === "\u0008") {
       this.isBackspaceKeypress = true;
@@ -130,11 +131,11 @@ export class GameScene {
     }
 
     if (this.promptCharPos === this.textPromptLength) {
-      if (this.storedKeypress === this.textPrompt) {
-        console.log("\nyou win");
-      } else {
-        console.log("\nCompleted");
-      }
+      // if (this.storedKeypress === this.textPrompt) {
+      //   console.log("\nyou win");
+      // } else {
+      //   console.log("\nCompleted");
+      // }
       const accuracy = calculateAccuracy(
         this.correctCharCount,
         this.textPromptLength
@@ -147,9 +148,8 @@ export class GameScene {
         wpm,
       };
 
-      showStats(stats);
       showCursor();
-      await writeFile("result", stats);
+      await writeToFile("result", stats);
       return { nextScene: "result" };
     }
 

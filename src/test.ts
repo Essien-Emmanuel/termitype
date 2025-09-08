@@ -12,7 +12,7 @@ function handleKey(handler: any) {
 
 class Scene {
   init() {}
-  update(key: string): { nextScene: string } {
+  async update(key: string): Promise<{ nextScene: string }> {
     return { nextScene: "" };
   }
 
@@ -134,10 +134,10 @@ class Engine {
     });
   }
 
-  private update() {
+  private async update() {
     const currentScene = this.sceneManager.currentScene;
     if (!this.key || !currentScene) return;
-    const result = this.sceneManager.currentScene?.update(this.key);
+    const result = await this.sceneManager.currentScene?.update(this.key);
     if (result) {
       this.sceneManager.load(result?.nextScene);
     }

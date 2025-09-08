@@ -20,9 +20,9 @@ export function applyTextStyle(config: ApplyTextStyleConfig) {
   }, "");
 }
 
-export async function readPrompts(filename: string) {
+export async function readGameFile(filename: string) {
   try {
-    const fp = path.join(__dirname, "..", `prompts/${filename}.txt`);
+    const fp = path.join(__dirname, "..", `${filename}`);
     const data = await readFile(fp);
 
     return data;
