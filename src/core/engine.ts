@@ -1,15 +1,18 @@
 import { SceneManager } from "./scene-manager";
 import { handleKey } from "./io";
+import type { InputKey } from "@/@types";
 
 export class Engine {
   public running: boolean;
-  public key: string | null;
+  public key: InputKey;
   public sceneManager: SceneManager;
+  public timeout: number;
 
   constructor() {
     this.sceneManager = new SceneManager();
     this.running = false;
-    this.key = null;
+    this.key = "";
+    this.timeout = 0;
   }
 
   private async processInput() {
@@ -35,15 +38,25 @@ export class Engine {
       // handle input
       await this.processInput();
 
-      // update
-      const result = await this.update();
+      const runUpdateAndRender = async () => {
+        // update
+        let result = await this.update();
 
-      // render scene
-      this.sceneManager.currentScene?.render();
+        // render scene
+        this.sceneManager.currentScene?.render();
 
-      if (result) {
-        this.sceneManager.load(result?.nextScene);
+        if (result) {
+          this.sceneManager.load(result?.nextScene);
+        }
+      };
+
+      if (this.sceneManager.currentScene?.timeout) {
+        setTimeout(async () => {
+          this.key = "timeout";
+          runUpdateAndRender();
+        }, this.sceneManager.currentScene.timeout);
       }
+      runUpdateAndRender();
     }
   }
 

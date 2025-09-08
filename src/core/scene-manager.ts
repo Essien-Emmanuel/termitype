@@ -3,13 +3,17 @@ import type {
   SceneManagerRegistry,
   SceneManagerRegisterArg,
 } from "@/@types";
+import type { Scene } from "./scene";
 
 export class SceneManager {
   private registry: SceneManagerRegistry;
   public currentScene: Scene | null;
+  // public timeout: number;
+
   constructor() {
     this.registry = new Map<string, SceneCtor>();
     this.currentScene = null;
+    // this.timeout = 0;
   }
 
   register({ name, scene }: SceneManagerRegisterArg) {

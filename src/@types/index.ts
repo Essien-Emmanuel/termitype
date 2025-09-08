@@ -1,3 +1,4 @@
+import type { Scene } from "@/core/scene";
 import type { Color } from "@/renderer/color";
 
 import type { ansiFontModes } from "@/renderer/font";
@@ -41,3 +42,7 @@ export type SceneCtor = new () => Scene;
 export type SceneManagerRegistry = Map<string, SceneCtor>;
 
 export type SceneManagerRegisterArg = { name: string; scene: SceneCtor };
+
+export type LooseAutoComplete<T extends string> = T | Omit<string, T>;
+
+export type InputKey = LooseAutoComplete<"timeout">;
