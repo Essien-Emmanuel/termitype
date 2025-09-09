@@ -62,7 +62,6 @@ export class GameScene {
     const { styledTextPrompt, textPromptRows, textPromptLength, textPrompt } =
       await initializeGame();
 
-    this.prevTime = Date.now();
     this.styledTextPrompt = styledTextPrompt;
     this.textPromptLength = textPromptLength;
     this.textPromptRows = textPromptRows;
@@ -71,6 +70,8 @@ export class GameScene {
   }
 
   async update($key: InputKey): Promise<{ nextScene: string }> {
+    if (!this.prevTime) this.prevTime = Date.now();
+
     let key = $key;
 
     this.storedKeypress += key;
@@ -91,6 +92,11 @@ export class GameScene {
 
     const currentTime = Date.now();
     const elapsedTime = currentTime - this.prevTime;
+
+    if (key === "timeout") {
+      this.saveStat(elapsedTime);
+      return { nextScene: "result" };
+    }
 
     if (this.isBackspaceKeypress) {
       if (this.promptCharPos > 0) {
@@ -131,8 +137,7 @@ export class GameScene {
       }
     }
 
-    // console.log({ key });
-    if (this.promptCharPos === this.textPromptLength || key === "timeout") {
+    if (this.promptCharPos === this.textPromptLength) {
       this.saveStat(elapsedTime);
       return { nextScene: "result" };
     }

@@ -33,30 +33,32 @@ export class Engine {
     return result;
   }
 
+  async runUpdateAndRender() {
+    // update
+    let result = await this.update();
+
+    // render scene
+    this.sceneManager.currentScene?.render();
+
+    // load next available screen
+    if (result) {
+      this.sceneManager.load(result?.nextScene);
+    }
+  }
+
   async loop() {
     while (this.running) {
       // handle input
       await this.processInput();
 
-      const runUpdateAndRender = async () => {
-        // update
-        let result = await this.update();
-
-        // render scene
-        this.sceneManager.currentScene?.render();
-
-        if (result) {
-          this.sceneManager.load(result?.nextScene);
-        }
-      };
-
       if (this.sceneManager.currentScene?.timeout) {
         setTimeout(async () => {
           this.key = "timeout";
-          runUpdateAndRender();
-        }, this.sceneManager.currentScene.timeout);
+          this.runUpdateAndRender();
+        }, this.sceneManager.currentScene?.timeout);
       }
-      runUpdateAndRender();
+
+      this.runUpdateAndRender();
     }
   }
 
