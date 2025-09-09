@@ -1,4 +1,4 @@
-import type { InputKey } from "@/@types";
+import type { InputKey, UpdateSceneReponse } from "@/@types";
 
 export class Scene {
   public timeout: number;
@@ -9,7 +9,7 @@ export class Scene {
 
   init() {}
 
-  async update(key: InputKey): Promise<{ nextScene: string }> {
+  async update(_key: InputKey): UpdateSceneReponse {
     return { nextScene: "" };
   }
 

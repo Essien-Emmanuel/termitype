@@ -16,26 +16,13 @@ export type ApplyTextStyleConfig = {
   styleFnConfig: Pick<StyleFontConfig, "color" | "mode">;
 };
 
-export type HandlekeypressHandlerArg = {
-  storedKeypress: string;
-  keypress: string;
-  keypressCount: number;
-  isTimeout: boolean;
-  isBackspaceKeypress: boolean;
-};
-
-export type HandlekeypressHandler = (args: HandlekeypressHandlerArg) => void;
-
-export type HandlekeypressOptions = {
-  storeKeypress?: boolean;
-  resetWindow?: boolean;
-  timeout?: number;
-  textPromptRows: number;
-};
+export type HandlekeypressHandler = (keypress: string) => void;
 
 export type FontMode = keyof typeof ansiFontModes;
 
 export type StyleFontConfig = { font: string; color?: Color; mode?: FontMode };
+
+export type UpdateSceneReponse = Promise<{ nextScene: string }>;
 
 export type SceneCtor = new () => Scene;
 

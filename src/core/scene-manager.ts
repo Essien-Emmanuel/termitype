@@ -6,29 +6,27 @@ import type {
 import type { Scene } from "./scene";
 
 export class SceneManager {
-  private registry: SceneManagerRegistry;
+  private _registry: SceneManagerRegistry;
   public currentScene: Scene | null;
-  // public timeout: number;
 
   constructor() {
-    this.registry = new Map<string, SceneCtor>();
+    this._registry = new Map<string, SceneCtor>();
     this.currentScene = null;
-    // this.timeout = 0;
   }
 
   register({ name, scene }: SceneManagerRegisterArg) {
-    const isKey = this.registry.has(name);
+    const isKey = this._registry.has(name);
     if (!isKey) {
-      this.registry.set(name, scene);
+      this._registry.set(name, scene);
     }
     return this;
   }
 
   load(sceneName: string) {
-    const isKey = this.registry.has(sceneName);
+    const isKey = this._registry.has(sceneName);
     if (!isKey) return;
 
-    const sceneCtor = this.registry.get(sceneName)!;
+    const sceneCtor = this._registry.get(sceneName)!;
     const scene = new sceneCtor();
     scene.init();
     this.currentScene = scene;
