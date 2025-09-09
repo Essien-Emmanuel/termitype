@@ -1,3 +1,4 @@
+import type { InputKey } from "@/@types";
 import {
   clearEntireScreen,
   moveDownBy,
@@ -6,19 +7,18 @@ import {
   setCursorPos,
   showCursor,
   write,
-  writeFile,
 } from "@/core/io";
-import { delay } from "@/core/utils";
+import { checkBackspace, checkEnter, delay } from "@/core/utils";
 import { initializeGame } from "@/game/init";
 import { calculateAccuracy, calculateWpm } from "@/game/math.game";
 import {
   matchKeypressToTextPromt,
-  showStats,
   updateStyledTextPrompt,
+  writeToFile,
 } from "@/game/utils.game";
 
 export class GameScene {
-  public keypress: string | null;
+  public keypress: InputKey;
   public storedKeypress: string;
   public keypressCount: number;
   public correctCharCount: number;
@@ -33,7 +33,7 @@ export class GameScene {
   public isBackspaceKeypress: boolean;
 
   constructor() {
-    this.keypress = null;
+    this.keypress = "";
     this.storedKeypress = "";
     this.styledTextPrompt = "";
     this.textPrompt = "";
@@ -62,7 +62,6 @@ export class GameScene {
     const { styledTextPrompt, textPromptRows, textPromptLength, textPrompt } =
       await initializeGame();
 
-    this.prevTime = Date.now();
     this.styledTextPrompt = styledTextPrompt;
     this.textPromptLength = textPromptLength;
     this.textPromptRows = textPromptRows;
@@ -70,25 +69,34 @@ export class GameScene {
     this.timeout = 1000 * 30;
   }
 
-  async update($key: string): Promise<{ nextScene: string }> {
-    let key = $key;
+  async update($key: InputKey): Promise<{ nextScene: string }> {
+    if (!this.prevTime) this.prevTime = Date.now();
 
-    if (key === "\r") {
-      key = "";
-    }
+    let key = $key;
 
     this.storedKeypress += key;
     this.keypress = key;
     ++this.keypressCount;
+    this.isBackspaceKeypress = false;
 
-    if (key === "\u0008") {
+    if (checkBackspace(key)) {
       this.isBackspaceKeypress = true;
+    }
+
+    if (checkEnter(key)) {
+      setCursorPos(this.promptCharPos);
+      return { nextScene: "" };
     }
 
     resetTerminalWindow(this.textPromptRows);
 
     const currentTime = Date.now();
     const elapsedTime = currentTime - this.prevTime;
+
+    if (key === "timeout") {
+      this.saveStat(elapsedTime);
+      return { nextScene: "result" };
+    }
 
     if (this.isBackspaceKeypress) {
       if (this.promptCharPos > 0) {
@@ -130,48 +138,33 @@ export class GameScene {
     }
 
     if (this.promptCharPos === this.textPromptLength) {
-      if (this.storedKeypress === this.textPrompt) {
-        console.log("\nyou win");
-      } else {
-        console.log("\nCompleted");
-      }
-      const accuracy = calculateAccuracy(
-        this.correctCharCount,
-        this.textPromptLength
-      );
-      const wpm = calculateWpm(this.promptCharPos, this.mistakes, elapsedTime);
-      const stats = {
-        accuracy,
-        timeout: elapsedTime,
-        mistakes: this.mistakes,
-        wpm,
-      };
-
-      showStats(stats);
-      showCursor();
-      await writeFile("result", stats);
+      this.saveStat(elapsedTime);
       return { nextScene: "result" };
     }
-
-    //   if (isTimeout) {
-    //     moveDownBy(this.textPromptRows + 1);
-    //     const accuracy = calculateAccuracy(this.correctCharCount, this.textPromptLength);
-    //     const wpm = calculateWpm(this.promptCharPos, this.mistakes, elapsedTime);
-
-    //     showStats({ accuracy, timeout: elapsedTime, mistakes, wpm });
-    //     showCursor();
-    //     process.exit();
-    //   }
-    ///
 
     return { nextScene: "" };
   }
 
   render() {
     setCursorPos();
-    // log to screen
     write(this.styledTextPrompt);
-
     positionTerminalCursor(this.promptCharPos + 1);
+  }
+
+  async saveStat(elapsedTime: number) {
+    const accuracy = calculateAccuracy(
+      this.correctCharCount,
+      this.textPromptLength
+    );
+    const wpm = calculateWpm(this.promptCharPos, this.mistakes, elapsedTime);
+    const stats = {
+      accuracy,
+      timeout: elapsedTime,
+      mistakes: this.mistakes,
+      wpm,
+    };
+
+    showCursor();
+    await writeToFile("result", stats);
   }
 }

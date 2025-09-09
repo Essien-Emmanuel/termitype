@@ -1,5 +1,5 @@
 import { Engine } from "./core/engine";
-import { GameScene, ResultScene, TitleScene } from "@scenes/index";
+import { GameScene, ResultScene, TitleScene } from "@/scenes";
 export const engine = new Engine();
 
 engine.sceneManager

@@ -1,6 +1,6 @@
 import process from "process";
 import fs from "fs/promises";
-import type { HandlekeypressHandler, HandlekeypressOptions } from "@/@types";
+import type { HandlekeypressHandler } from "@/@types";
 
 const { stdin, stdout } = process;
 
@@ -36,77 +36,7 @@ export function clearEntireScreen() {
   process.stdout.write("\x1b[2J\n");
 }
 
-export function handleKeypress(
-  handler: HandlekeypressHandler,
-  {
-    storeKeypress = false,
-    resetWindow = false,
-    timeout,
-    textPromptRows,
-  }: HandlekeypressOptions
-) {
-  stdin.removeAllListeners("data");
-  stdin.setEncoding("utf8");
-  stdin.setRawMode(true);
-
-  let keypressCount = 0;
-  let storedKeypress = "";
-  let $keypress = "";
-
-  if (timeout) {
-    // set timeout
-    const timer = setTimeout(() => {
-      clearTimeout(timer);
-      handler({
-        storedKeypress,
-        keypress: $keypress,
-        keypressCount,
-        isTimeout: true,
-        isBackspaceKeypress: false,
-      });
-      process.removeAllListeners("data");
-    }, timeout);
-  }
-
-  stdin.on("data", (keypress: string) => {
-    let isBackspaceKeypress = false;
-    ++keypressCount;
-    $keypress = keypress;
-
-    if (storeKeypress) {
-      if (keypress === "\r") {
-        storedKeypress += "";
-      } else {
-        storedKeypress += keypress;
-      }
-    } else {
-      storedKeypress = keypress;
-    }
-
-    if (keypress === "\u0008") {
-      isBackspaceKeypress = true;
-    }
-
-    if (resetWindow) {
-      resetTerminalWindow(textPromptRows);
-    }
-
-    if (keypress === "\u0003") {
-      showCursor();
-      process.exit();
-    }
-
-    handler({
-      storedKeypress,
-      keypress,
-      keypressCount,
-      isTimeout: false,
-      isBackspaceKeypress,
-    });
-  });
-}
-
-export function handleKey(handler: any) {
+export function handleKeypress(handler: HandlekeypressHandler) {
   stdin.removeAllListeners("data");
   stdin.setRawMode(true);
   stdin.setEncoding("utf-8");

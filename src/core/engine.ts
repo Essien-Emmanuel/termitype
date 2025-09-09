@@ -1,56 +1,70 @@
 import { SceneManager } from "./scene-manager";
-import { handleKey } from "./io";
+import { handleKeypress } from "./io";
+import type { InputKey } from "@/@types";
 
 export class Engine {
-  public running: boolean;
-  public key: string | null;
+  private _running: boolean;
+  private _key: InputKey;
   public sceneManager: SceneManager;
+  public timeout: number;
 
   constructor() {
     this.sceneManager = new SceneManager();
-    this.running = false;
-    this.key = null;
+    this._running = false;
+    this._key = "";
+    this.timeout = 0;
   }
 
-  private async processInput() {
+  private async _processInput() {
     await new Promise((resolve) => {
-      handleKey((key: string) => {
-        this.key = key;
-        if (key) return resolve(null);
+      handleKeypress((keypress: string) => {
+        this._key = keypress;
+        if (keypress) return resolve(null);
       });
     });
   }
 
-  private update() {
+  private async _update() {
     const currentScene = this.sceneManager.currentScene;
-    if (!this.key || !currentScene) return;
+    if (!this._key || !currentScene) return;
 
-    const result = this.sceneManager.currentScene?.update(this.key);
+    const result = await this.sceneManager.currentScene?.update(this._key);
 
     return result;
   }
 
+  private async _runUpdateAndRender() {
+    let result = await this._update();
+
+    this.sceneManager.currentScene?.render();
+
+    if (result) {
+      this.sceneManager.load(result?.nextScene);
+    }
+  }
+
   async loop() {
-    while (this.running) {
-      await this.processInput();
-      const result = this.update();
+    while (this._running) {
+      await this._processInput();
 
-      // render scene
-      this.sceneManager.currentScene?.render();
-
-      if (result) {
-        this.sceneManager.load(result?.nextScene);
+      if (this.sceneManager.currentScene?.timeout) {
+        setTimeout(async () => {
+          this._key = "timeout";
+          this._runUpdateAndRender();
+        }, this.sceneManager.currentScene?.timeout);
       }
+
+      this._runUpdateAndRender();
     }
   }
 
   run(initialSceneName: string) {
-    this.running = true;
+    this._running = true;
     this.sceneManager.load(initialSceneName);
     this.loop();
   }
 
   stop() {
-    this.running = false;
+    this._running = false;
   }
 }
