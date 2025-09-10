@@ -1,3 +1,4 @@
+import type { sceneNames } from "@/config/scene-names";
 import type { Scene } from "@/core/scene";
 import type { Color } from "@/renderer/color";
 
@@ -22,13 +23,20 @@ export type FontMode = keyof typeof ansiFontModes;
 
 export type StyleFontConfig = { font: string; color?: Color; mode?: FontMode };
 
-export type UpdateSceneReponse = Promise<{ nextScene: string }>;
+export type SceneNames = (typeof sceneNames)[number];
+
+export type SceneName<T extends string> = T | Omit<string, T>;
+
+export type UpdateSceneReponse = Promise<{
+  nextScene: SceneName<SceneNames>;
+}>;
 
 export type SceneCtor = new () => Scene;
 
-export type SceneManagerRegistry = Map<string, SceneCtor>;
-
-export type SceneManagerRegisterArg = { name: string; scene: SceneCtor };
+export type SceneManagerRegistry<T extends string> = Map<
+  SceneName<T>,
+  SceneCtor
+>;
 
 export type LooseAutoComplete<T extends string> = T | Omit<string, T>;
 

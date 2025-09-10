@@ -2,7 +2,7 @@ import { readGameFile } from "@/game/utils.game";
 import { showStats } from "@/game/utils.game";
 import type { PlayerStat } from "@/game/@types";
 import { clearEntireScreen } from "@/core/io";
-import type { InputKey } from "@/@types";
+import type { InputKey, UpdateSceneReponse } from "@/@types";
 import { Scene } from "@/core/scene";
 
 export class ResultScene extends Scene {
@@ -25,7 +25,7 @@ export class ResultScene extends Scene {
     showStats({ accuracy, timeout, mistakes, wpm });
   }
 
-  async update(key: InputKey): Promise<{ nextScene: string }> {
+  async update(key: InputKey): UpdateSceneReponse {
     if (key === "\u0003") {
       console.log("GameEnds");
     }

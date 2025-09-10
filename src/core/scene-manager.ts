@@ -1,28 +1,32 @@
 import type {
   SceneCtor,
   SceneManagerRegistry,
-  SceneManagerRegisterArg,
+  SceneName,
+  SceneNames,
 } from "@/@types";
 import type { Scene } from "./scene";
 
-export class SceneManager {
-  private _registry: SceneManagerRegistry;
+export class SceneManager<T extends string> {
+  readonly _registry: SceneManagerRegistry<T>;
   public currentScene: Scene | null;
+  public sceneName: SceneName<T>;
 
   constructor() {
     this._registry = new Map<string, SceneCtor>();
     this.currentScene = null;
+    this.sceneName = "";
   }
 
-  register({ name, scene }: SceneManagerRegisterArg) {
+  register(name: SceneName<T>, sceneCtor: SceneCtor) {
     const isKey = this._registry.has(name);
     if (!isKey) {
-      this._registry.set(name, scene);
+      this.sceneName = name;
+      this._registry.set(name, sceneCtor);
     }
     return this;
   }
 
-  load(sceneName: string) {
+  load(sceneName: SceneName<T>) {
     const isKey = this._registry.has(sceneName);
     if (!isKey) return;
 

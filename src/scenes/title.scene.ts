@@ -1,4 +1,4 @@
-import type { InputKey } from "@/@types";
+import type { InputKey, UpdateSceneReponse } from "@/@types";
 import { Scene } from "@/core/scene";
 
 export class TitleScene extends Scene {
@@ -10,7 +10,7 @@ export class TitleScene extends Scene {
     console.log("loading title...");
   }
 
-  async update(key: InputKey): Promise<{ nextScene: string }> {
+  async update(key: InputKey): UpdateSceneReponse {
     if (key === "n") {
       return { nextScene: "game" };
     }
