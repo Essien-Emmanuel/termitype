@@ -1,4 +1,4 @@
-import type { InputKey } from "@/@types";
+import type { InputKey, UpdateSceneReponse } from "@/@types";
 import {
   clearEntireScreen,
   moveDownBy,
@@ -8,6 +8,7 @@ import {
   showCursor,
   write,
 } from "@/core/io";
+import { Scene } from "@/core/scene";
 import { checkBackspace, checkEnter, delay } from "@/core/utils";
 import { initializeGame } from "@/game/init";
 import { calculateAccuracy, calculateWpm } from "@/game/math.game";
@@ -17,7 +18,7 @@ import {
   writeToFile,
 } from "@/game/utils.game";
 
-export class GameScene {
+export class GameScene extends Scene {
   public keypress: InputKey;
   public storedKeypress: string;
   public keypressCount: number;
@@ -25,7 +26,6 @@ export class GameScene {
   public prevTime: number;
   public textPromptRows: number;
   public promptCharPos: number;
-  public timeout: number;
   public mistakes: number;
   public textPromptLength: number;
   public textPrompt: string;
@@ -33,6 +33,7 @@ export class GameScene {
   public isBackspaceKeypress: boolean;
 
   constructor() {
+    super();
     this.keypress = "";
     this.storedKeypress = "";
     this.styledTextPrompt = "";
@@ -44,7 +45,6 @@ export class GameScene {
     this.textPromptLength = 0;
     this.mistakes = 0;
     this.prevTime = 0;
-    this.timeout = 0;
     this.isBackspaceKeypress = false;
   }
 
@@ -69,7 +69,7 @@ export class GameScene {
     this.timeout = 1000 * 30;
   }
 
-  async update($key: InputKey): Promise<{ nextScene: string }> {
+  async update($key: InputKey): UpdateSceneReponse {
     if (!this.prevTime) this.prevTime = Date.now();
 
     let key = $key;

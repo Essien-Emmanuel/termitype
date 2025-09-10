@@ -2,14 +2,14 @@ import { SceneManager } from "./scene-manager";
 import { handleKeypress } from "./io";
 import type { InputKey } from "@/@types";
 
-export class Engine {
+export class Engine<T extends string> {
   private _running: boolean;
   private _key: InputKey;
-  public sceneManager: SceneManager;
+  public sceneManager: SceneManager<T>;
   public timeout: number;
 
   constructor() {
-    this.sceneManager = new SceneManager();
+    this.sceneManager = new SceneManager<T>();
     this._running = false;
     this._key = "";
     this.timeout = 0;
@@ -39,7 +39,7 @@ export class Engine {
     this.sceneManager.currentScene?.render();
 
     if (result) {
-      this.sceneManager.load(result?.nextScene);
+      this.sceneManager.load(result?.nextScene as string);
     }
   }
 
@@ -58,7 +58,7 @@ export class Engine {
     }
   }
 
-  run(initialSceneName: string) {
+  run(initialSceneName: T) {
     this._running = true;
     this.sceneManager.load(initialSceneName);
     this.loop();
