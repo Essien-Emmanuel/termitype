@@ -5,11 +5,11 @@ import type { InputKey } from "@/@types";
 export class Engine<T extends string> {
   private _running: boolean;
   private _key: InputKey;
-  public sceneManager: SceneManager<T>;
+  public sceneManager: SceneManager;
   public timeout: number;
 
   constructor() {
-    this.sceneManager = new SceneManager<T>();
+    this.sceneManager = new SceneManager();
     this._running = false;
     this._key = "";
     this.timeout = 0;
@@ -39,7 +39,7 @@ export class Engine<T extends string> {
     this.sceneManager.currentScene?.render();
 
     if (result) {
-      this.sceneManager.load(result?.nextScene as string);
+      this.sceneManager.load(result?.nextScene);
     }
   }
 
