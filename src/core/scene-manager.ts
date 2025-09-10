@@ -1,15 +1,10 @@
-import type {
-  SceneCtor,
-  SceneManagerRegistry,
-  SceneName,
-  SceneNames,
-} from "@/@types";
+import type { SceneCtor, SceneManagerRegistry, SceneName } from "@/@types";
 import type { Scene } from "./scene";
 
-export class SceneManager<T extends string> {
-  readonly _registry: SceneManagerRegistry<T>;
+export class SceneManager {
+  readonly _registry: SceneManagerRegistry;
   public currentScene: Scene | null;
-  public sceneName: SceneName<T>;
+  public sceneName: SceneName;
 
   constructor() {
     this._registry = new Map<string, SceneCtor>();
@@ -17,7 +12,7 @@ export class SceneManager<T extends string> {
     this.sceneName = "";
   }
 
-  register(name: SceneName<T>, sceneCtor: SceneCtor) {
+  register(name: SceneName, sceneCtor: SceneCtor) {
     const isKey = this._registry.has(name);
     if (!isKey) {
       this.sceneName = name;
@@ -26,7 +21,7 @@ export class SceneManager<T extends string> {
     return this;
   }
 
-  load(sceneName: SceneName<T>) {
+  load(sceneName: SceneName) {
     const isKey = this._registry.has(sceneName);
     if (!isKey) return;
 

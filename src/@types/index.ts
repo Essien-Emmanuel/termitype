@@ -25,18 +25,15 @@ export type StyleFontConfig = { font: string; color?: Color; mode?: FontMode };
 
 export type SceneNames = (typeof sceneNames)[number];
 
-export type SceneName<T extends string> = T | Omit<string, T>;
+export type SceneName = SceneNames | (string & {});
 
 export type UpdateSceneReponse = Promise<{
-  nextScene: SceneName<SceneNames>;
+  nextScene: SceneName;
 }>;
 
 export type SceneCtor = new () => Scene;
 
-export type SceneManagerRegistry<T extends string> = Map<
-  SceneName<T>,
-  SceneCtor
->;
+export type SceneManagerRegistry = Map<SceneName, SceneCtor>;
 
 export type LooseAutoComplete<T extends string> = T | Omit<string, T>;
 
