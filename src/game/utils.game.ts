@@ -6,9 +6,12 @@ import type {
 } from "./@types";
 import { readFile, writeFile } from "@/core/io";
 import { styleFont, styleFontReset } from "@/renderer/font";
-import { checkBackspace } from "@/core/utils";
+import type { InputKey } from "@/@types";
+import { Input } from "@/core/input";
 
 const __dirname = import.meta.dirname;
+
+const { isBackspace } = Input;
 
 export function applyTextStyle(config: ApplyTextStyleConfig) {
   const { styleFn, styleFnConfig, text } = config;
@@ -56,10 +59,10 @@ export function showStats(playerStat: PlayerStat) {
 
 export function matchKeypressToTextPromt(
   textPrompt: string,
-  keypress: string,
+  keypress: InputKey,
   promptFontPos: number
 ) {
-  if (checkBackspace(keypress)) {
+  if (isBackspace(keypress)) {
     return {
       match: false,
       fontPos: promptFontPos,

@@ -9,7 +9,7 @@ import {
   write,
 } from "@/core/io";
 import { Scene } from "@/core/scene";
-import { checkBackspace, checkEnter, delay } from "@/core/utils";
+import { delay } from "@/core/utils";
 import { initializeGame } from "@/game/init";
 import { calculateAccuracy, calculateWpm } from "@/game/math.game";
 import {
@@ -17,6 +17,9 @@ import {
   updateStyledTextPrompt,
   writeToFile,
 } from "@/game/utils.game";
+import { Input } from "@/core/input";
+
+const { isBackspace: checkBackspace, isEnter, isChar, isCtrlL } = Input;
 
 export class GameScene extends Scene {
   public keypress: InputKey;
@@ -59,6 +62,10 @@ export class GameScene extends Scene {
     clearEntireScreen();
     moveDownBy(1);
 
+    /**
+     * if saved state, fill all the data and call render
+     */
+
     const { styledTextPrompt, textPromptRows, textPromptLength, textPrompt } =
       await initializeGame();
 
@@ -66,10 +73,21 @@ export class GameScene extends Scene {
     this.textPromptLength = textPromptLength;
     this.textPromptRows = textPromptRows;
     this.textPrompt = textPrompt;
-    this.timeout = 1000 * 30;
+    this.timeout = 1000 * 5;
   }
 
   async update($key: InputKey): UpdateSceneReponse {
+    if (isCtrlL($key)) {
+      this.cancelSetTimout = true;
+
+      console.log("game ", JSON.stringify(this));
+
+      /**
+       *  save the state of the game
+       */
+      return { nextScene: "gameMenu" };
+    }
+
     if (!this.prevTime) this.prevTime = Date.now();
 
     let key = $key;
@@ -83,7 +101,7 @@ export class GameScene extends Scene {
       this.isBackspaceKeypress = true;
     }
 
-    if (checkEnter(key)) {
+    if (isEnter(key)) {
       setCursorPos(this.promptCharPos);
       return { nextScene: "" };
     }
@@ -93,7 +111,7 @@ export class GameScene extends Scene {
     const currentTime = Date.now();
     const elapsedTime = currentTime - this.prevTime;
 
-    if (key === "timeout") {
+    if (isChar(key, "timeout")) {
       this.saveStat(elapsedTime);
       return { nextScene: "result" };
     }

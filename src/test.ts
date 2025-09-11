@@ -9,8 +9,8 @@ class SceneMgr<T extends string> {
     return this;
   }
 }
-const sm = new SceneMgr();
-
 const scenes = ["title", "game", "result"];
+type Scene = (typeof scenes)[number];
+const sm = new SceneMgr<Scene>();
 
-sm.reg("title").reg("game");
+sm.reg("");

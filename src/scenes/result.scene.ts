@@ -4,6 +4,9 @@ import type { PlayerStat } from "@/game/@types";
 import { clearEntireScreen } from "@/core/io";
 import type { InputKey, UpdateSceneReponse } from "@/@types";
 import { Scene } from "@/core/scene";
+import { Input } from "@/core/input";
+
+const { isEnter } = Input;
 
 export class ResultScene extends Scene {
   public result: PlayerStat;
@@ -26,7 +29,7 @@ export class ResultScene extends Scene {
   }
 
   async update(key: InputKey): UpdateSceneReponse {
-    if (key === "\u0003") {
+    if (isEnter(key)) {
       console.log("GameEnds");
     }
     return { nextScene: "" };
