@@ -21,6 +21,21 @@ import { Input } from "@/core/input";
 
 const { isBackspace: checkBackspace, isEnter, isChar, isCtrlL } = Input;
 
+export type GameStateConfig = {
+  keypress: InputKey;
+  storedKeypress: string;
+  keypressCount: number;
+  correctCharCount: number;
+  prevTime: number;
+  textPromptRows: number;
+  promptCharPos: number;
+  mistakes: number;
+  textPromptLength: number;
+  textPrompt: string;
+  styledTextPrompt: string;
+  isBackspaceKeypress: boolean;
+};
+
 export class GameScene extends Scene {
   public keypress: InputKey;
   public storedKeypress: string;
@@ -74,17 +89,18 @@ export class GameScene extends Scene {
     this.textPromptRows = textPromptRows;
     this.textPrompt = textPrompt;
     this.timeout = 1000 * 5;
+
+    await writeToFile("game-state", this);
   }
 
   async update($key: InputKey): UpdateSceneReponse {
     if (isCtrlL($key)) {
       this.cancelSetTimout = true;
 
-      console.log("game ", JSON.stringify(this));
-
       /**
        *  save the state of the game
        */
+      await writeToFile("game-state", this);
       return { nextScene: "gameMenu" };
     }
 
@@ -156,6 +172,7 @@ export class GameScene extends Scene {
     }
 
     if (this.promptCharPos === this.textPromptLength) {
+      console.log(this);
       this.saveStat(elapsedTime);
       return { nextScene: "result" };
     }

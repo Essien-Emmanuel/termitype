@@ -6,14 +6,14 @@ export class Engine<T extends string> {
   private _running: boolean;
   private _key: InputKey;
   public sceneManager: SceneManager;
-  public timeout: number;
+  // public timeout: number;
   public timeoutId: NodeJS.Timeout | undefined;
 
   constructor() {
     this.sceneManager = new SceneManager();
     this._running = false;
     this._key = "";
-    this.timeout = 0;
+    // this.timeout = 0;
     this.timeoutId = undefined;
   }
 
@@ -53,9 +53,10 @@ export class Engine<T extends string> {
 
       await this._processInput();
 
-      if (this.sceneManager.currentScene?.timeout) {
+      if (this.sceneManager.currentScene?.timeout && !this.timeoutId) {
         this.timeoutId = setTimeout(() => {
           this._key = "timeout";
+          clearTimeout(this.timeoutId);
           this._runUpdateAndRender();
         }, this.sceneManager.currentScene?.timeout);
       }

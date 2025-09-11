@@ -27,6 +27,7 @@ export class SceneManager {
 
     const sceneCtor = this._registry.get(sceneName)!;
     const scene = new sceneCtor();
+
     scene.init();
     this.currentScene = scene;
   }
