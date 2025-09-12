@@ -27,7 +27,6 @@ export async function readGameFile(filename: string) {
   try {
     const fp = path.join(__dirname, "..", `${filename}`);
     const data = await readFile(fp);
-
     return data;
   } catch (error) {
     console.error(error);

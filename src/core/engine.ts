@@ -49,6 +49,7 @@ export class Engine<T extends string> {
     while (this._running) {
       if (this.timeoutId && this.sceneManager.currentScene?.cancelSetTimout) {
         clearTimeout(this.timeoutId);
+        this.timeoutId = undefined;
       }
 
       await this._processInput();

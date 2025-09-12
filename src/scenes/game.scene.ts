@@ -14,6 +14,7 @@ import { initializeGame } from "@/game/init";
 import { calculateAccuracy, calculateWpm } from "@/game/math.game";
 import {
   matchKeypressToTextPromt,
+  readGameFile,
   updateStyledTextPrompt,
   writeToFile,
 } from "@/game/utils.game";
@@ -77,9 +78,39 @@ export class GameScene extends Scene {
     clearEntireScreen();
     moveDownBy(1);
 
+    const gameState = await readGameFile("/saves/game-state.json");
     /**
      * if saved state, fill all the data and call render
      */
+    if (gameState) {
+      const data: typeof this = JSON.parse(gameState);
+      // console.log({ data });
+
+      this.correctCharCount = data.correctCharCount;
+      this.isBackspaceKeypress = data.isBackspaceKeypress;
+      this.keypress = data.keypress;
+      this.keypressCount = data.keypressCount;
+      this.mistakes = data.mistakes;
+      this.promptCharPos = data.promptCharPos;
+      this.storedKeypress = data.storedKeypress;
+      this.styledTextPrompt = data.styledTextPrompt;
+      this.textPromptRows = data.textPromptRows;
+      this.textPromptLength = data.textPromptLength;
+      this.textPrompt = data.textPrompt;
+      this.timeout = data.timeout;
+      this.prevTime = 0;
+      this.cancelSetTimout = false;
+
+      write(this.styledTextPrompt);
+      positionTerminalCursor(this.promptCharPos + 1);
+
+      // if (this.textPromptLength === this.promptCharPos) {
+      //   const newGameInstance = new GameScene();
+      //   await writeToFile("game-state", newGameInstance);
+      // }
+
+      return;
+    }
 
     const { styledTextPrompt, textPromptRows, textPromptLength, textPrompt } =
       await initializeGame();
@@ -94,17 +125,22 @@ export class GameScene extends Scene {
   }
 
   async update($key: InputKey): UpdateSceneReponse {
+    if (!this.prevTime) this.prevTime = Date.now();
+
+    const currentTime = Date.now();
+    const elapsedTime = currentTime - this.prevTime;
+
     if (isCtrlL($key)) {
       this.cancelSetTimout = true;
-
       /**
        *  save the state of the game
        */
-      await writeToFile("game-state", this);
+      const timeoutLeft = this.timeout - elapsedTime;
+      const gameState: this = { elapsedTime, ...this, timeout: timeoutLeft };
+
+      await writeToFile("game-state", gameState);
       return { nextScene: "gameMenu" };
     }
-
-    if (!this.prevTime) this.prevTime = Date.now();
 
     let key = $key;
 
@@ -123,9 +159,6 @@ export class GameScene extends Scene {
     }
 
     resetTerminalWindow(this.textPromptRows);
-
-    const currentTime = Date.now();
-    const elapsedTime = currentTime - this.prevTime;
 
     if (isChar(key, "timeout")) {
       this.saveStat(elapsedTime);
@@ -172,7 +205,6 @@ export class GameScene extends Scene {
     }
 
     if (this.promptCharPos === this.textPromptLength) {
-      console.log(this);
       this.saveStat(elapsedTime);
       return { nextScene: "result" };
     }
