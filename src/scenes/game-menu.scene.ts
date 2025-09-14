@@ -12,9 +12,11 @@ export class GameMenuScene extends Scene {
   }
 
   async update(key: InputKey): UpdateSceneReponse {
+    // replay
     if (isChar(key, "r")) {
       return { nextScene: "game" };
     }
+    // back to title
     if (isChar(key, "n")) {
       return { nextScene: "title" };
     }

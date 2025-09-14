@@ -50,6 +50,8 @@ export class GameScene extends Scene {
   public textPrompt: string;
   public styledTextPrompt: string;
   public isBackspaceKeypress: boolean;
+  private initTimeout: number;
+  private timeUsed: number;
 
   constructor() {
     super();
@@ -65,6 +67,8 @@ export class GameScene extends Scene {
     this.mistakes = 0;
     this.prevTime = 0;
     this.isBackspaceKeypress = false;
+    this.initTimeout = 5000;
+    this.timeUsed = 0;
   }
 
   async init() {
@@ -84,32 +88,35 @@ export class GameScene extends Scene {
      */
     if (gameState) {
       const data: typeof this = JSON.parse(gameState);
-      // console.log({ data });
+      const stateDataLen = Object.keys(data).length;
 
-      this.correctCharCount = data.correctCharCount;
-      this.isBackspaceKeypress = data.isBackspaceKeypress;
-      this.keypress = data.keypress;
-      this.keypressCount = data.keypressCount;
-      this.mistakes = data.mistakes;
-      this.promptCharPos = data.promptCharPos;
-      this.storedKeypress = data.storedKeypress;
-      this.styledTextPrompt = data.styledTextPrompt;
-      this.textPromptRows = data.textPromptRows;
-      this.textPromptLength = data.textPromptLength;
-      this.textPrompt = data.textPrompt;
-      this.timeout = data.timeout;
-      this.prevTime = 0;
-      this.cancelSetTimout = false;
+      if (stateDataLen) {
+        this.correctCharCount = data.correctCharCount;
+        this.isBackspaceKeypress = data.isBackspaceKeypress;
+        this.keypress = data.keypress;
+        this.keypressCount = data.keypressCount;
+        this.mistakes = data.mistakes;
+        this.promptCharPos = data.promptCharPos;
+        this.storedKeypress = data.storedKeypress;
+        this.styledTextPrompt = data.styledTextPrompt;
+        this.textPromptRows = data.textPromptRows;
+        this.textPromptLength = data.textPromptLength;
+        this.textPrompt = data.textPrompt;
+        this.timeUsed = data.timeUsed;
+        this.timeout = data.timeout;
+        this.prevTime = 0;
+        this.cancelSetTimout = false;
 
-      write(this.styledTextPrompt);
-      positionTerminalCursor(this.promptCharPos + 1);
+        write(this.styledTextPrompt);
+        positionTerminalCursor(this.promptCharPos + 1);
 
-      // if (this.textPromptLength === this.promptCharPos) {
-      //   const newGameInstance = new GameScene();
-      //   await writeToFile("game-state", newGameInstance);
-      // }
+        // if (this.textPromptLength === this.promptCharPos) {
+        //   const newGameInstance = new GameScene();
+        //   await writeToFile("game-state", newGameInstance);
+        // }
 
-      return;
+        return;
+      }
     }
 
     const { styledTextPrompt, textPromptRows, textPromptLength, textPrompt } =
@@ -119,7 +126,7 @@ export class GameScene extends Scene {
     this.textPromptLength = textPromptLength;
     this.textPromptRows = textPromptRows;
     this.textPrompt = textPrompt;
-    this.timeout = 1000 * 5;
+    this.timeout = this.initTimeout;
 
     await writeToFile("game-state", this);
   }
@@ -129,14 +136,15 @@ export class GameScene extends Scene {
 
     const currentTime = Date.now();
     const elapsedTime = currentTime - this.prevTime;
+    const timeoutLeft = this.timeout - elapsedTime;
+    this.timeUsed = this.initTimeout - timeoutLeft;
 
     if (isCtrlL($key)) {
       this.cancelSetTimout = true;
       /**
        *  save the state of the game
        */
-      const timeoutLeft = this.timeout - elapsedTime;
-      const gameState: this = { elapsedTime, ...this, timeout: timeoutLeft };
+      const gameState: this = { ...this, timeout: timeoutLeft };
 
       await writeToFile("game-state", gameState);
       return { nextScene: "gameMenu" };
@@ -161,7 +169,7 @@ export class GameScene extends Scene {
     resetTerminalWindow(this.textPromptRows);
 
     if (isChar(key, "timeout")) {
-      this.saveStat(elapsedTime);
+      this.saveStat(this.timeUsed);
       return { nextScene: "result" };
     }
 
@@ -205,7 +213,7 @@ export class GameScene extends Scene {
     }
 
     if (this.promptCharPos === this.textPromptLength) {
-      this.saveStat(elapsedTime);
+      this.saveStat(this.timeUsed);
       return { nextScene: "result" };
     }
 
@@ -233,5 +241,6 @@ export class GameScene extends Scene {
 
     showCursor();
     await writeToFile("result", stats);
+    await writeToFile("game-state", {});
   }
 }
