@@ -21,7 +21,9 @@ export type HandlekeypressHandler = (keypress: string) => void;
 
 export type FontMode = keyof typeof ansiFontModes;
 
-export type StyleFontConfig = { font: string; color?: Color; mode?: FontMode };
+export type StyleConfig = { color?: Color; mode?: FontMode };
+
+export type StyleFontConfig = { font: string } & StyleConfig;
 
 export type SceneNames = (typeof sceneNames)[number];
 
@@ -38,3 +40,5 @@ export type SceneManagerRegistry = Map<SceneName, SceneCtor>;
 export type LooseAutoComplete<T extends string> = T | Omit<string, T>;
 
 export type InputKey = LooseAutoComplete<"timeout">;
+
+export type MenuNavs = { up: InputKey[]; down: InputKey[] };

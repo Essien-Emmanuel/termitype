@@ -4,10 +4,10 @@ export function calculateWpm(
   elapsedTime: number
 ) {
   const grossWpm = keypressCount / 5;
-  const oneMin = 1000; //* 60;
-  const elapsedTimeInMin = elapsedTime / oneMin;
+  const mins = 1000 * 60;
+  const elapsedTimeInMin = elapsedTime / mins;
 
-  const wpm = grossWpm - uncorrectedErrorsCount / elapsedTimeInMin;
+  const wpm = (grossWpm - uncorrectedErrorsCount) / elapsedTimeInMin;
   return Math.round(wpm);
 }
 

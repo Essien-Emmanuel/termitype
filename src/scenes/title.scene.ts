@@ -1,6 +1,7 @@
 import type { InputKey, UpdateSceneReponse } from "@/@types";
 import { Scene } from "@/core/scene";
 import { Input } from "@/core/input";
+import { clearEntireScreen } from "@/core/io";
 
 const { isCtrlL, isChar } = Input;
 
@@ -10,6 +11,7 @@ export class TitleScene extends Scene {
   }
 
   init() {
+    clearEntireScreen();
     console.log("loading title...");
   }
 

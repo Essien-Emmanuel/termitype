@@ -22,21 +22,6 @@ import { Input } from "@/core/input";
 
 const { isBackspace: checkBackspace, isEnter, isChar, isCtrlL } = Input;
 
-export type GameStateConfig = {
-  keypress: InputKey;
-  storedKeypress: string;
-  keypressCount: number;
-  correctCharCount: number;
-  prevTime: number;
-  textPromptRows: number;
-  promptCharPos: number;
-  mistakes: number;
-  textPromptLength: number;
-  textPrompt: string;
-  styledTextPrompt: string;
-  isBackspaceKeypress: boolean;
-};
-
 export class GameScene extends Scene {
   public keypress: InputKey;
   public storedKeypress: string;
@@ -83,9 +68,7 @@ export class GameScene extends Scene {
     moveDownBy(1);
 
     const gameState = await readGameFile("/saves/game-state.json");
-    /**
-     * if saved state, fill all the data and call render
-     */
+
     if (gameState) {
       const data: typeof this = JSON.parse(gameState);
       const stateDataLen = Object.keys(data).length;
@@ -109,11 +92,6 @@ export class GameScene extends Scene {
 
         write(this.styledTextPrompt);
         positionTerminalCursor(this.promptCharPos + 1);
-
-        // if (this.textPromptLength === this.promptCharPos) {
-        //   const newGameInstance = new GameScene();
-        //   await writeToFile("game-state", newGameInstance);
-        // }
 
         return;
       }
@@ -213,6 +191,9 @@ export class GameScene extends Scene {
     }
 
     if (this.promptCharPos === this.textPromptLength) {
+      /**
+       * Save the stats of the player
+       */
       this.saveStat(this.timeUsed);
       return { nextScene: "result" };
     }

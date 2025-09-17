@@ -1,27 +1,63 @@
 import type { InputKey, UpdateSceneReponse } from "@/@types";
-import { clearEntireScreen } from "@/core/io";
+import {
+  clearEntireScreen,
+  hideCursor,
+  setCursorPos,
+  showCursor,
+  write,
+} from "@/core/io";
 import { Scene } from "@/core/scene";
 import { Input } from "@/core/input";
+import { Menu } from "@/components";
 
-const { isChar, isCtrlC } = Input;
+const { isChar, isEnter } = Input;
+
+const gameMenu = ["Resume", "New Game", "Main Menu", "Exit"] as const;
+
+type GameMenu = (typeof gameMenu)[number] | (string & {});
 
 export class GameMenuScene extends Scene {
+  private menu: Menu;
+  protected opt: GameMenu;
+  protected menuStr: string;
+  protected selected: boolean;
+
+  constructor() {
+    super();
+    this.menu = new Menu(gameMenu);
+    this.opt = "";
+    this.menuStr = "";
+    this.selected = false;
+  }
+
   init(): void {
     clearEntireScreen();
-    console.log("loading game menu...");
+    setCursorPos();
+
+    const { opt, menu } = this.menu.getOpt();
+    this.opt = opt;
+    this.menuStr = menu;
+    hideCursor();
+    write(menu);
   }
 
   async update(key: InputKey): UpdateSceneReponse {
-    // replay
-    if (isChar(key, "r")) {
+    this.selected = isEnter(key) ? true : false;
+
+    const { opt, menu } = this.menu.getOpt(key);
+    this.opt = opt;
+    this.menuStr = menu;
+
+    if (isChar<GameMenu>(opt, "Resume") && this.selected) {
       return { nextScene: "game" };
     }
-    // back to title
-    if (isChar(key, "n")) {
+
+    if (isChar<GameMenu>(opt, "Main Menu") && this.selected) {
       return { nextScene: "title" };
     }
 
-    if (isCtrlC(key)) {
+    if (isChar<GameMenu>(opt, "Exit") && this.selected) {
+      showCursor();
       process.exit();
     }
 
@@ -29,6 +65,9 @@ export class GameMenuScene extends Scene {
   }
 
   render(): void {
-    console.log("pause\nplay");
+    // clearEntireScreen();
+    process.stdout.write("\x1b[3J");
+    setCursorPos();
+    write(this.menuStr);
   }
 }
