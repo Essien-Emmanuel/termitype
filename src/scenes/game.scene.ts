@@ -56,47 +56,7 @@ export class GameScene extends Scene {
     this.timeUsed = 0;
   }
 
-  async init() {
-    clearEntireScreen();
-    // set cursor position
-    moveDownBy(1);
-
-    console.log("initializing game...");
-
-    delay();
-    clearEntireScreen();
-    moveDownBy(1);
-
-    const gameState = await readGameFile("/saves/game-state.json");
-
-    if (gameState) {
-      const data: typeof this = JSON.parse(gameState);
-      const stateDataLen = Object.keys(data).length;
-
-      if (stateDataLen) {
-        this.correctCharCount = data.correctCharCount;
-        this.isBackspaceKeypress = data.isBackspaceKeypress;
-        this.keypress = data.keypress;
-        this.keypressCount = data.keypressCount;
-        this.mistakes = data.mistakes;
-        this.promptCharPos = data.promptCharPos;
-        this.storedKeypress = data.storedKeypress;
-        this.styledTextPrompt = data.styledTextPrompt;
-        this.textPromptRows = data.textPromptRows;
-        this.textPromptLength = data.textPromptLength;
-        this.textPrompt = data.textPrompt;
-        this.timeUsed = data.timeUsed;
-        this.timeout = data.timeout;
-        this.prevTime = 0;
-        this.cancelSetTimout = false;
-
-        write(this.styledTextPrompt);
-        positionTerminalCursor(this.promptCharPos + 1);
-
-        return;
-      }
-    }
-
+  private async _initGameState() {
     const { styledTextPrompt, textPromptRows, textPromptLength, textPrompt } =
       await initializeGame();
 
@@ -107,6 +67,56 @@ export class GameScene extends Scene {
     this.timeout = this.initTimeout;
 
     await writeToFile("game-state", this);
+    return;
+  }
+
+  async init() {
+    clearEntireScreen();
+    // set cursor position
+    moveDownBy(1);
+
+    console.log("initializing game...");
+
+    delay();
+    clearEntireScreen();
+    moveDownBy(1);
+    showCursor();
+
+    const gameState = await readGameFile("/saves/game-state.json");
+
+    if (!gameState) {
+      this._initGameState();
+      return;
+    }
+
+    const data: typeof this = JSON.parse(gameState);
+    const stateDataLen = Object.keys(data).length;
+
+    if (!stateDataLen) {
+      this._initGameState();
+      return;
+    }
+
+    this.correctCharCount = data.correctCharCount;
+    this.isBackspaceKeypress = data.isBackspaceKeypress;
+    this.keypress = data.keypress;
+    this.keypressCount = data.keypressCount;
+    this.mistakes = data.mistakes;
+    this.promptCharPos = data.promptCharPos;
+    this.storedKeypress = data.storedKeypress;
+    this.styledTextPrompt = data.styledTextPrompt;
+    this.textPromptRows = data.textPromptRows;
+    this.textPromptLength = data.textPromptLength;
+    this.textPrompt = data.textPrompt;
+    this.timeUsed = data.timeUsed;
+    this.timeout = data.timeout;
+    this.prevTime = 0;
+    this.cancelSetTimout = false;
+
+    write(this.styledTextPrompt);
+    positionTerminalCursor(this.promptCharPos + 1);
+
+    return;
   }
 
   async update($key: InputKey): UpdateSceneReponse {

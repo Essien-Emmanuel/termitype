@@ -1,16 +1,2 @@
-class SceneMgr<T extends string> {
-  public name: T | Omit<string, T>;
-
-  constructor() {
-    this.name = "";
-  }
-  reg(name: T) {
-    this.name = name;
-    return this;
-  }
-}
-const scenes = ["title", "game", "result"];
-type Scene = (typeof scenes)[number];
-const sm = new SceneMgr<Scene>();
-
-sm.reg("");
+console.log("\x1b[1;32m\x1b[4mhello\x1b[24m\x1b[0m");
+console.log("\x1b[4m\x1b[1;32mhello\x1b[24m\x1b[0m");

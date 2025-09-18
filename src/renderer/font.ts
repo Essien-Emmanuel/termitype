@@ -14,6 +14,7 @@ export const ansiFontModes = {
 } as const;
 
 export const styleFontReset = `\x1b[${ansiFontModes.reset}m`;
+export const styleUnderlineReset = `\x1b[24m`;
 
 export function getFontStyle(
   config: StyleConfig = { color: "white", mode: "bold" }

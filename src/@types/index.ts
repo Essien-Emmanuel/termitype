@@ -31,6 +31,8 @@ export type SceneName = SceneNames | (string & {});
 
 export type UpdateSceneReponse = Promise<{
   nextScene: SceneName;
+  saved?: boolean;
+  [key: string]: any;
 }>;
 
 export type SceneCtor = new () => Scene;

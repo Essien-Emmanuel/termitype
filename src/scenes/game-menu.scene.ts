@@ -49,7 +49,7 @@ export class GameMenuScene extends Scene {
     this.menuStr = menu;
 
     if (isChar<GameMenu>(opt, "Resume") && this.selected) {
-      return { nextScene: "game" };
+      return { nextScene: "game", new: true };
     }
 
     if (isChar<GameMenu>(opt, "Main Menu") && this.selected) {
@@ -57,6 +57,7 @@ export class GameMenuScene extends Scene {
     }
 
     if (isChar<GameMenu>(opt, "Exit") && this.selected) {
+      clearEntireScreen();
       showCursor();
       process.exit();
     }
@@ -65,8 +66,7 @@ export class GameMenuScene extends Scene {
   }
 
   render(): void {
-    // clearEntireScreen();
-    process.stdout.write("\x1b[3J");
+    clearEntireScreen();
     setCursorPos();
     write(this.menuStr);
   }

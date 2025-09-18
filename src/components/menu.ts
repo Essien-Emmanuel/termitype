@@ -1,6 +1,6 @@
 import type { InputKey, MenuNavs } from "@/@types";
 import { unicodeCharacters } from "@/core/input";
-import { getFontStyle } from "@/renderer/font";
+import { getFontStyle, styleUnderlineReset } from "@/renderer/font";
 
 const arrowUp = unicodeCharacters["arrowUp"];
 const arrowDown = unicodeCharacters["arrowDown"];
@@ -50,9 +50,11 @@ export class Menu {
       let optId = "  ";
       if (i === this.optIndex) {
         optId = "> ";
-        fontWeight = getFontStyle();
+        fontWeight = getFontStyle() + getFontStyle({ mode: "underline" });
       }
-      acc += optId + fontWeight + opt + fontStyleReset + "\n";
+
+      acc +=
+        optId + fontWeight + opt + styleUnderlineReset + fontStyleReset + "\n";
       return acc;
     }, "");
   }
