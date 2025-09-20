@@ -1,0 +1,1 @@
+Concurrency means tasks run at the same time: Thread-1, Thread-2, etc. But without synchronization (locks, semaphores, barriers), errors like race conditions or deadlocks occur. Big-O notation—O(n), O(n log n)—measures algorithm growth.

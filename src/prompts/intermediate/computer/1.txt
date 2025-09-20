@@ -1,0 +1,1 @@
+An algorithm is a step-by-step process. What makes one efficient? Speed, memory use, and correctness—three key measures! Every coder must think carefully about trade-offs.

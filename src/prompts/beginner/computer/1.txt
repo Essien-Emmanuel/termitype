@@ -1,0 +1,1 @@
+A computer takes input, processes it, and gives output. Programs tell the machine what to do.

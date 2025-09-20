@@ -1,0 +1,1 @@
+Turbine efficiency (η) = useful power output ÷ energy input. Engineers analyze drag, lift, Reynolds number (Re = ρuL/μ), and Mach effects.

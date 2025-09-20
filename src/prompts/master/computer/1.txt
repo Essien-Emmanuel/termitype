@@ -1,0 +1,1 @@
+Computational complexity theory asks: can every NP problem be solved in polynomial time (P = NP)? Many problems—SAT, Traveling Salesman, Clique—are NP-complete, requiring ~O(2^n) time in worst cases. Modern cryptography (RSA, AES-256, SHA-3) relies on hardness assumptions, while quantum computing (Shor’s algorithm) threatens established paradigms.
