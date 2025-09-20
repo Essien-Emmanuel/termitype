@@ -1,0 +1,1 @@
+Exergy (X) quantifies maximum useful work: X = U + p₀V − T₀S. Losses arise from irreversibilities—friction, heat leaks, ΔT > 0. Advanced cycles (Brayton @ 1500°C, Rankine with reheat, combined-cycle gas turbines) illustrate thermodynamic optimization for sustainable energy systems.

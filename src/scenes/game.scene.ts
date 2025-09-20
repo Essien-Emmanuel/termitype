@@ -1,4 +1,4 @@
-import type { InputKey, UpdateSceneReponse } from "@/@types";
+import type { InputKey, UpdateSceneReponse, WordMapReturnType } from "@/@types";
 import {
   clearEntireScreen,
   moveDownBy,
@@ -9,14 +9,19 @@ import {
   write,
 } from "@/core/io";
 import { Scene } from "@/core/scene";
-import { checkBackspace, checkEnter, delay } from "@/core/utils";
+import { delay } from "@/core/utils";
 import { initializeGame } from "@/game/init";
 import { calculateAccuracy, calculateWpm } from "@/game/math.game";
 import {
+  createAfterWordMap,
   matchKeypressToTextPromt,
+  readGameFile,
   updateStyledTextPrompt,
   writeToFile,
 } from "@/game/utils.game";
+import { Input } from "@/core/input";
+
+const { isBackspace: checkBackspace, isEnter, isChar, isCtrlL } = Input;
 
 export class GameScene extends Scene {
   public keypress: InputKey;
@@ -31,6 +36,13 @@ export class GameScene extends Scene {
   public textPrompt: string;
   public styledTextPrompt: string;
   public isBackspaceKeypress: boolean;
+  private initTimeout: number;
+  private timeUsed: number;
+  protected afterWordMap: WordMapReturnType | null;
+  protected afterWordMapKeys: string[] | null;
+  protected wordIndex: number;
+  protected storedWord: string;
+  protected wKeyCount: number;
 
   constructor() {
     super();
@@ -46,6 +58,33 @@ export class GameScene extends Scene {
     this.mistakes = 0;
     this.prevTime = 0;
     this.isBackspaceKeypress = false;
+    this.initTimeout = 10000;
+    this.timeUsed = 0;
+
+    // #1 set up to track word
+    this.afterWordMap = null;
+    this.afterWordMapKeys = null;
+    this.wordIndex = 0;
+    this.storedWord = "";
+    this.wKeyCount = 0;
+  }
+
+  private async _initGameState() {
+    const { styledTextPrompt, textPromptRows, textPromptLength, textPrompt } =
+      await initializeGame();
+
+    this.styledTextPrompt = styledTextPrompt;
+    this.textPromptLength = textPromptLength;
+    this.textPromptRows = textPromptRows;
+    this.textPrompt = textPrompt;
+    this.timeout = this.initTimeout;
+
+    // #1
+    this.afterWordMap = createAfterWordMap(textPrompt);
+    this.afterWordMapKeys = Object.keys(this.afterWordMap);
+
+    await writeToFile("game-state", this);
+    return;
   }
 
   async init() {
@@ -58,19 +97,64 @@ export class GameScene extends Scene {
     delay();
     clearEntireScreen();
     moveDownBy(1);
+    showCursor();
 
-    const { styledTextPrompt, textPromptRows, textPromptLength, textPrompt } =
-      await initializeGame();
+    const gameState = await readGameFile("/saves/game-state.json");
 
-    this.styledTextPrompt = styledTextPrompt;
-    this.textPromptLength = textPromptLength;
-    this.textPromptRows = textPromptRows;
-    this.textPrompt = textPrompt;
-    this.timeout = 1000 * 30;
+    if (!gameState) {
+      this._initGameState();
+
+      return;
+    }
+
+    const data: typeof this = JSON.parse(gameState);
+    const stateDataLen = Object.keys(data).length;
+
+    if (!stateDataLen) {
+      this._initGameState();
+      return;
+    }
+
+    this.correctCharCount = data.correctCharCount;
+    this.isBackspaceKeypress = data.isBackspaceKeypress;
+    this.keypress = data.keypress;
+    this.keypressCount = data.keypressCount;
+    this.mistakes = data.mistakes;
+    this.promptCharPos = data.promptCharPos;
+    this.storedKeypress = data.storedKeypress;
+    this.styledTextPrompt = data.styledTextPrompt;
+    this.textPromptRows = data.textPromptRows;
+    this.textPromptLength = data.textPromptLength;
+    this.textPrompt = data.textPrompt;
+    this.timeUsed = data.timeUsed;
+    this.timeout = data.timeout;
+    this.prevTime = 0;
+    this.cancelSetTimout = false;
+
+    write(this.styledTextPrompt);
+    positionTerminalCursor(this.promptCharPos + 1);
+
+    return;
   }
 
   async update($key: InputKey): UpdateSceneReponse {
     if (!this.prevTime) this.prevTime = Date.now();
+
+    const currentTime = Date.now();
+    const elapsedTime = currentTime - this.prevTime;
+    const timeoutLeft = this.timeout - elapsedTime;
+    this.timeUsed = this.initTimeout - timeoutLeft;
+
+    if (isCtrlL($key)) {
+      this.cancelSetTimout = true;
+      /**
+       *  save the state of the game
+       */
+      const gameState: this = { ...this, timeout: timeoutLeft };
+
+      await writeToFile("game-state", gameState);
+      return { nextScene: "gameMenu" };
+    }
 
     let key = $key;
 
@@ -83,18 +167,15 @@ export class GameScene extends Scene {
       this.isBackspaceKeypress = true;
     }
 
-    if (checkEnter(key)) {
+    if (isEnter(key)) {
       setCursorPos(this.promptCharPos);
       return { nextScene: "" };
     }
 
     resetTerminalWindow(this.textPromptRows);
 
-    const currentTime = Date.now();
-    const elapsedTime = currentTime - this.prevTime;
-
-    if (key === "timeout") {
-      this.saveStat(elapsedTime);
+    if (isChar(key, "timeout")) {
+      this.saveStat(this.timeUsed);
       return { nextScene: "result" };
     }
 
@@ -110,8 +191,49 @@ export class GameScene extends Scene {
       if (this.correctCharCount > 0) {
         --this.correctCharCount;
       }
+
+      // #1
+      if (
+        this.wordIndex > 0 &&
+        this.afterWordMapKeys &&
+        this.keypressCount <= +this.afterWordMapKeys[this.wordIndex - 1]
+      ) {
+        --this.wordIndex;
+        const currWordKey = this.afterWordMapKeys[this.wordIndex];
+        if (this.afterWordMap) {
+          const wordData = this.afterWordMap[currWordKey].typed;
+          this.storedWord = wordData.slice(0, -1);
+        }
+      }
+      this.wKeyCount = Math.max(--this.wKeyCount, 0);
+      this.storedWord = this.storedWord.slice(0, -1);
     } else {
       ++this.promptCharPos;
+
+      // #1
+      this.wKeyCount = Math.min(++this.wKeyCount, this.textPrompt.length);
+      this.storedWord += key;
+      if (
+        this.afterWordMapKeys &&
+        this.wKeyCount > +this.afterWordMapKeys[this.wordIndex]
+      ) {
+        ++this.wordIndex;
+      }
+    }
+
+    // #1
+    if (
+      this.afterWordMap &&
+      this.wKeyCount in this.afterWordMap &&
+      !this.isBackspaceKeypress
+    ) {
+      this.afterWordMap[this.wKeyCount].typed = this.storedWord;
+      if (!this.afterWordMap[this.wKeyCount].visited) {
+        this.afterWordMap[this.wKeyCount].visited = true;
+      } else {
+        this.afterWordMap[this.wKeyCount].corrected = true;
+      }
+      this.storedWord = "";
     }
 
     const { match, fontPos, mistake, isBackspace } = matchKeypressToTextPromt(
@@ -138,7 +260,10 @@ export class GameScene extends Scene {
     }
 
     if (this.promptCharPos === this.textPromptLength) {
-      this.saveStat(elapsedTime);
+      /**
+       * Save the stats of the player
+       */
+      this.saveStat(this.timeUsed);
       return { nextScene: "result" };
     }
 
@@ -152,11 +277,18 @@ export class GameScene extends Scene {
   }
 
   async saveStat(elapsedTime: number) {
+    const uncorrectedErrorsCount = this._countUncorrectedErrors();
+
     const accuracy = calculateAccuracy(
       this.correctCharCount,
       this.textPromptLength
     );
-    const wpm = calculateWpm(this.promptCharPos, this.mistakes, elapsedTime);
+
+    const wpm = calculateWpm(
+      this.promptCharPos,
+      uncorrectedErrorsCount,
+      elapsedTime
+    );
     const stats = {
       accuracy,
       timeout: elapsedTime,
@@ -166,5 +298,18 @@ export class GameScene extends Scene {
 
     showCursor();
     await writeToFile("result", stats);
+    await writeToFile("game-state", {});
+  }
+
+  private _countUncorrectedErrors() {
+    if (!this.afterWordMap) return 0;
+    const wordMapValues = Object.values(this.afterWordMap);
+    const uncorrectedWordCount = wordMapValues.reduce((acc, curr) => {
+      if (!curr.corrected && curr.word !== curr.typed) {
+        ++acc;
+      }
+      return acc;
+    }, 0);
+    return uncorrectedWordCount;
   }
 }

@@ -1,4 +1,4 @@
-import type { StyleFontConfig } from "@/@types";
+import type { StyleConfig, StyleFontConfig } from "@/@types";
 import { ansiColorCodes } from "./color";
 
 export const ansiFontModes = {
@@ -14,6 +14,14 @@ export const ansiFontModes = {
 } as const;
 
 export const styleFontReset = `\x1b[${ansiFontModes.reset}m`;
+export const styleUnderlineReset = `\x1b[24m`;
+
+export function getFontStyle(
+  config: StyleConfig = { color: "white", mode: "bold" }
+) {
+  const { color = "white", mode = "bold" } = config;
+  return `\x1b[${ansiFontModes[mode]};${ansiColorCodes[color]}m`;
+}
 
 export function styleFont(config: StyleFontConfig) {
   const { font, mode = "bold", color = "white" } = config;

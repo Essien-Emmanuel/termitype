@@ -6,13 +6,15 @@ export class Engine<T extends string> {
   private _running: boolean;
   private _key: InputKey;
   public sceneManager: SceneManager;
-  public timeout: number;
+  // public timeout: number;
+  public timeoutId: NodeJS.Timeout | undefined;
 
   constructor() {
     this.sceneManager = new SceneManager();
     this._running = false;
     this._key = "";
-    this.timeout = 0;
+    // this.timeout = 0;
+    this.timeoutId = undefined;
   }
 
   private async _processInput() {
@@ -43,13 +45,19 @@ export class Engine<T extends string> {
     }
   }
 
-  async loop() {
+  private async _loop() {
     while (this._running) {
+      if (this.timeoutId && this.sceneManager.currentScene?.cancelSetTimout) {
+        clearTimeout(this.timeoutId);
+        this.timeoutId = undefined;
+      }
+
       await this._processInput();
 
-      if (this.sceneManager.currentScene?.timeout) {
-        setTimeout(async () => {
+      if (this.sceneManager.currentScene?.timeout && !this.timeoutId) {
+        this.timeoutId = setTimeout(() => {
           this._key = "timeout";
+          clearTimeout(this.timeoutId);
           this._runUpdateAndRender();
         }, this.sceneManager.currentScene?.timeout);
       }
@@ -61,7 +69,7 @@ export class Engine<T extends string> {
   run(initialSceneName: T) {
     this._running = true;
     this.sceneManager.load(initialSceneName);
-    this.loop();
+    this._loop();
   }
 
   stop() {

@@ -1,5 +1,9 @@
 import type { InputKey, UpdateSceneReponse } from "@/@types";
 import { Scene } from "@/core/scene";
+import { clearEntireScreen } from "@/core/io";
+import { Input } from "@/core/input";
+
+const { isCtrlC } = Input;
 
 export class TitleScene extends Scene {
   constructor() {
@@ -7,14 +11,15 @@ export class TitleScene extends Scene {
   }
 
   init() {
+    clearEntireScreen();
     console.log("loading title...");
   }
 
   async update(key: InputKey): UpdateSceneReponse {
-    if (key === "n") {
-      return { nextScene: "game" };
+    if (isCtrlC(key)) {
+      process.exit();
     }
-    return { nextScene: "" };
+    return { nextScene: "mainMenu" };
   }
 
   render() {

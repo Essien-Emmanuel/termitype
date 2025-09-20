@@ -21,7 +21,9 @@ export type HandlekeypressHandler = (keypress: string) => void;
 
 export type FontMode = keyof typeof ansiFontModes;
 
-export type StyleFontConfig = { font: string; color?: Color; mode?: FontMode };
+export type StyleConfig = { color?: Color; mode?: FontMode };
+
+export type StyleFontConfig = { font: string } & StyleConfig;
 
 export type SceneNames = (typeof sceneNames)[number];
 
@@ -29,6 +31,8 @@ export type SceneName = SceneNames | (string & {});
 
 export type UpdateSceneReponse = Promise<{
   nextScene: SceneName;
+  saved?: boolean;
+  [key: string]: any;
 }>;
 
 export type SceneCtor = new () => Scene;
@@ -38,3 +42,15 @@ export type SceneManagerRegistry = Map<SceneName, SceneCtor>;
 export type LooseAutoComplete<T extends string> = T | Omit<string, T>;
 
 export type InputKey = LooseAutoComplete<"timeout">;
+
+export type MenuNavs = { up: InputKey[]; down: InputKey[] };
+
+export type WordMapValue = {
+  word: string;
+  len: number;
+  typed: string;
+  visited: boolean;
+  corrected: boolean;
+};
+
+export type WordMapReturnType = Record<string, WordMapValue>;

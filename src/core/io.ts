@@ -33,7 +33,7 @@ export function moveDownBy(lines: number) {
 }
 
 export function clearEntireScreen() {
-  process.stdout.write("\x1b[2J\n");
+  process.stdout.write("\x1b[2J\x1b[3J\x1b[H\n");
 }
 
 export function handleKeypress(handler: HandlekeypressHandler) {

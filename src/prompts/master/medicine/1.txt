@@ -1,0 +1,1 @@
+Homeostasis regulates pH (~7.4), glucose (~90 mg/dL), and temperature (37°C). Failure leads to pathologies: acidosis, hyperglycemia, hypothermia. Clinicians track ions (Na⁺, K⁺, Cl⁻), hormone feedback loops (insulin ↔ glucagon), and Δ-values. Such fine regulation exemplifies systems biology at the molecular-to-organism scale.
