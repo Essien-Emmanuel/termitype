@@ -6,7 +6,7 @@ import type {
 } from "./@types";
 import { readFile, writeFile } from "@/core/io";
 import { styleFont, styleFontReset } from "@/renderer/font";
-import type { InputKey } from "@/@types";
+import type { InputKey, WordMapReturnType } from "@/@types";
 import { Input } from "@/core/input";
 
 const __dirname = import.meta.dirname;
@@ -123,4 +123,44 @@ export function updateStyledTextPrompt({
   styledKeys[fontPos] = styledFont;
 
   return styledKeys.join(`\x1b`) + styleFontReset;
+}
+
+/**
+ * Map word data to the position just after the word. more like position
+ * and not index:
+ *  So word 'this' is mapped to {5: {word: 'this'}} instead of {4: {word: 'this}}
+ */
+export function createAfterWordMap(prompt: string) {
+  const afterWordMap: WordMapReturnType = {};
+  let spacePos = 0;
+  let charCount = 0;
+  let word = "";
+
+  for (const char of prompt) {
+    ++charCount;
+    ++spacePos;
+    word += char;
+    if (char === " ") {
+      afterWordMap[spacePos] = {
+        word,
+        len: charCount - 1, // -1 to account for the space
+        typed: "",
+        visited: false,
+        corrected: false,
+      };
+      charCount = 0;
+      word = "";
+    }
+
+    if (prompt.length === spacePos) {
+      afterWordMap[spacePos] = {
+        word,
+        len: charCount,
+        typed: "",
+        visited: false,
+        corrected: false,
+      };
+    }
+  }
+  return afterWordMap;
 }

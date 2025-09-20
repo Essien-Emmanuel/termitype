@@ -44,3 +44,13 @@ export type LooseAutoComplete<T extends string> = T | Omit<string, T>;
 export type InputKey = LooseAutoComplete<"timeout">;
 
 export type MenuNavs = { up: InputKey[]; down: InputKey[] };
+
+export type WordMapValue = {
+  word: string;
+  len: number;
+  typed: string;
+  visited: boolean;
+  corrected: boolean;
+};
+
+export type WordMapReturnType = Record<string, WordMapValue>;
