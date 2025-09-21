@@ -9,7 +9,7 @@ export class Scene {
     this.cancelSetTimout = false;
   }
 
-  init() {}
+  init(_arg?: string) {}
 
   async update(_key: InputKey): UpdateSceneReponse {
     return { nextScene: "" };

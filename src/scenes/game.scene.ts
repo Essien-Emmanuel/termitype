@@ -69,9 +69,9 @@ export class GameScene extends Scene {
     this.wKeyCount = 0;
   }
 
-  private async _initGameState() {
+  private async _initGameState(filename: string) {
     const { styledTextPrompt, textPromptRows, textPromptLength, textPrompt } =
-      await initializeGame();
+      await initializeGame(filename);
 
     this.styledTextPrompt = styledTextPrompt;
     this.textPromptLength = textPromptLength;
@@ -87,7 +87,7 @@ export class GameScene extends Scene {
     return;
   }
 
-  async init() {
+  async init(initArg: string) {
     clearEntireScreen();
     // set cursor position
     moveDownBy(1);
@@ -102,7 +102,7 @@ export class GameScene extends Scene {
     const gameState = await readGameFile("/saves/game-state.json");
 
     if (!gameState) {
-      this._initGameState();
+      this._initGameState(initArg);
 
       return;
     }
@@ -111,7 +111,7 @@ export class GameScene extends Scene {
     const stateDataLen = Object.keys(data).length;
 
     if (!stateDataLen) {
-      this._initGameState();
+      this._initGameState(initArg);
       return;
     }
 

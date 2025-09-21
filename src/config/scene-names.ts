@@ -4,6 +4,7 @@ export const sceneNames = [
    */
   "title",
   "mainMenu",
+  "practiceCategoryMenu",
   "game",
   "gameMenu",
   "result",

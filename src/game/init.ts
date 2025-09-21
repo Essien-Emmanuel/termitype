@@ -2,8 +2,12 @@ import { applyTextStyle, readGameFile } from "./utils.game";
 import { styleFont, styleFontReset } from "@/renderer/font";
 import { positionTerminalCursor, write } from "@/core/io";
 
-export async function initializeGame(filename: string = "test") {
-  const rawTextPrompt = await readGameFile(`prompts/${filename}.txt`);
+export async function initializeGame(filename: string) {
+  const targetPromptFile = filename
+    ? `prompts/beginner/${filename}/1.txt`
+    : `prompts/test.txt`;
+
+  const rawTextPrompt = await readGameFile(targetPromptFile);
 
   if (!rawTextPrompt) {
     process.stdout.write(

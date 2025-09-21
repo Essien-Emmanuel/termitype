@@ -29,9 +29,13 @@ export type SceneNames = (typeof sceneNames)[number];
 
 export type SceneName = SceneNames | (string & {});
 
+export type UpdateSceneReponseData = {
+  opt: string;
+};
+
 export type UpdateSceneReponse = Promise<{
   nextScene: SceneName;
-  saved?: boolean;
+  data?: UpdateSceneReponseData;
   [key: string]: any;
 }>;
 

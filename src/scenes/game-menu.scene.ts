@@ -13,7 +13,7 @@ import { writeToFile } from "@/game/utils.game";
 
 const { isChar, isEnter } = Input;
 
-const gameMenu = ["Resume", "New Game", "Main Menu", "Exit"] as const;
+const gameMenu = ["Resume", "Practice", "Main Menu", "Exit"] as const;
 
 type GameMenu = (typeof gameMenu)[number] | (string & {});
 
@@ -53,7 +53,7 @@ export class GameMenuScene extends Scene {
       return { nextScene: "game" };
     }
 
-    if (isChar<GameMenu>(opt, "New Game") && this.selected) {
+    if (isChar<GameMenu>(opt, "Practice") && this.selected) {
       await writeToFile("game-state", {});
       return { nextScene: "game" };
     }
