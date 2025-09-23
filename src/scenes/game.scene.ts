@@ -1,4 +1,4 @@
-import type { InputKey, UpdateSceneReponse, WordMapReturnType } from "@/@types";
+import type { InputKey, UpdateSceneReponse } from "@/@types";
 import {
   clearEntireScreen,
   moveDownBy,
@@ -13,7 +13,6 @@ import { delay } from "@/core/utils";
 import { initializeGame } from "@/game/init";
 import { calculateAccuracy, calculateWpm } from "@/game/math.game";
 import {
-  createAfterWordMap,
   matchKeypressToTextPromt,
   readGameFile,
   updateStyledTextPrompt,
@@ -38,11 +37,6 @@ export class GameScene extends Scene {
   public isBackspaceKeypress: boolean;
   private initTimeout: number;
   private timeUsed: number;
-  protected afterWordMap: WordMapReturnType | null;
-  protected afterWordMapKeys: string[] | null;
-  protected wordIndex: number;
-  protected storedWord: string;
-  protected wKeyCount: number;
 
   constructor() {
     super();
@@ -60,13 +54,6 @@ export class GameScene extends Scene {
     this.isBackspaceKeypress = false;
     this.initTimeout = 10000;
     this.timeUsed = 0;
-
-    // #1 set up to track word
-    this.afterWordMap = null;
-    this.afterWordMapKeys = null;
-    this.wordIndex = 0;
-    this.storedWord = "";
-    this.wKeyCount = 0;
   }
 
   private async _initGameState(filename: string) {
@@ -78,10 +65,6 @@ export class GameScene extends Scene {
     this.textPromptRows = textPromptRows;
     this.textPrompt = textPrompt;
     this.timeout = this.initTimeout;
-
-    // #1
-    this.afterWordMap = createAfterWordMap(textPrompt);
-    this.afterWordMapKeys = Object.keys(this.afterWordMap);
 
     await writeToFile("game-state", this);
     return;
@@ -191,49 +174,8 @@ export class GameScene extends Scene {
       if (this.correctCharCount > 0) {
         --this.correctCharCount;
       }
-
-      // #1
-      if (
-        this.wordIndex > 0 &&
-        this.afterWordMapKeys &&
-        this.keypressCount <= +this.afterWordMapKeys[this.wordIndex - 1]
-      ) {
-        --this.wordIndex;
-        const currWordKey = this.afterWordMapKeys[this.wordIndex];
-        if (this.afterWordMap) {
-          const wordData = this.afterWordMap[currWordKey].typed;
-          this.storedWord = wordData.slice(0, -1);
-        }
-      }
-      this.wKeyCount = Math.max(--this.wKeyCount, 0);
-      this.storedWord = this.storedWord.slice(0, -1);
     } else {
       ++this.promptCharPos;
-
-      // #1
-      this.wKeyCount = Math.min(++this.wKeyCount, this.textPrompt.length);
-      this.storedWord += key;
-      if (
-        this.afterWordMapKeys &&
-        this.wKeyCount > +this.afterWordMapKeys[this.wordIndex]
-      ) {
-        ++this.wordIndex;
-      }
-    }
-
-    // #1
-    if (
-      this.afterWordMap &&
-      this.wKeyCount in this.afterWordMap &&
-      !this.isBackspaceKeypress
-    ) {
-      this.afterWordMap[this.wKeyCount].typed = this.storedWord;
-      if (!this.afterWordMap[this.wKeyCount].visited) {
-        this.afterWordMap[this.wKeyCount].visited = true;
-      } else {
-        this.afterWordMap[this.wKeyCount].corrected = true;
-      }
-      this.storedWord = "";
     }
 
     const { match, fontPos, mistake, isBackspace } = matchKeypressToTextPromt(
@@ -277,20 +219,14 @@ export class GameScene extends Scene {
   }
 
   async saveStat(elapsedTime: number) {
-    const uncorrectedErrorsCount = this._countUncorrectedErrors();
-
     const accuracy = calculateAccuracy(
       this.correctCharCount,
       this.textPromptLength
     );
 
-    const wpm = calculateWpm(
-      this.promptCharPos,
-      uncorrectedErrorsCount,
-      elapsedTime
-    );
+    const wpm = calculateWpm(this.promptCharPos, accuracy, elapsedTime);
     const stats = {
-      accuracy,
+      accuracy: accuracy * 100,
       timeout: elapsedTime,
       mistakes: this.mistakes,
       wpm,
@@ -299,17 +235,5 @@ export class GameScene extends Scene {
     showCursor();
     await writeToFile("result", stats);
     await writeToFile("game-state", {});
-  }
-
-  private _countUncorrectedErrors() {
-    if (!this.afterWordMap) return 0;
-    const wordMapValues = Object.values(this.afterWordMap);
-    const uncorrectedWordCount = wordMapValues.reduce((acc, curr) => {
-      if (!curr.corrected && curr.word !== curr.typed) {
-        ++acc;
-      }
-      return acc;
-    }, 0);
-    return uncorrectedWordCount;
   }
 }

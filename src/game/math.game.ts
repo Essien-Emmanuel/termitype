@@ -1,19 +1,23 @@
 export function calculateWpm(
   keypressCount: number,
-  uncorrectedErrorsCount: number,
+  accuracy: number,
   elapsedTime: number
 ) {
-  const grossWpm = keypressCount / 5;
-  const mins = 1000 * 10;
-  const elapsedTimeInMin = elapsedTime / mins;
+  const wordPerKeypress = keypressCount / 5;
+  const oneMin = 1000 * 60;
+  const elapsedTimeInMin = elapsedTime / oneMin;
 
-  const wpm = (grossWpm - uncorrectedErrorsCount) / elapsedTimeInMin;
-  return Math.max(Math.round(wpm), 0);
+  if (elapsedTimeInMin <= 0) return 0;
+
+  const grossWpm = wordPerKeypress / elapsedTimeInMin;
+
+  const netWpm = grossWpm * accuracy;
+  return Math.max(Math.round(netWpm), 0);
 }
 
 export function calculateAccuracy(
   correctCharCount: number,
   totalPromptLength: number
 ) {
-  return (correctCharCount / totalPromptLength) * 100;
+  return correctCharCount / totalPromptLength;
 }

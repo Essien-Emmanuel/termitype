@@ -33,7 +33,7 @@ export class MainMenuScene extends Scene {
     this.selected = false;
 
     let hasGameState = false;
-    const mainMenu = ["Practice", "Practice Category", "Exit"];
+    const mainMenu = ["Practice", "Practice Category", "Settings", "Exit"];
 
     const fsRead = fs.readFileSync(fp);
     const gameStateStr = fsRead.toString();
@@ -83,6 +83,10 @@ export class MainMenuScene extends Scene {
     if (isChar(opt, "Practice") && this.selected) {
       await writeToFile("game-state", {});
       return { nextScene: "game" };
+    }
+
+    if (isChar(opt, "Settings") && this.selected) {
+      return { nextScene: "settings" };
     }
 
     if (isChar(opt, "Exit") && this.selected) {

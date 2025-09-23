@@ -5,6 +5,12 @@ import { getFontStyle, styleUnderlineReset } from "@/renderer/font";
 const arrowUp = unicodeCharacters["arrowUp"];
 const arrowDown = unicodeCharacters["arrowDown"];
 
+export type MenuConfig = {
+  navs?: MenuNavs;
+  checkedOpt: string;
+  optCheckMarker: string;
+};
+
 export class Menu {
   public menuArr: readonly string[];
   private navs: MenuNavs;
@@ -13,10 +19,18 @@ export class Menu {
   private menuStr: string;
   private optIndex: number;
   private key: InputKey;
+  public checkedOpt: string;
+  public optCheckMarker: string;
 
-  constructor(menuArr: readonly string[], navs?: MenuNavs) {
+  constructor(menuArr: readonly string[], config?: MenuConfig) {
     this.menuArr = menuArr;
-    this.navs = navs || { up: [arrowUp], down: [arrowDown] };
+    this.navs =
+      config && config.navs
+        ? config.navs
+        : { up: [arrowUp], down: [arrowDown] };
+    this.checkedOpt = config && config.checkedOpt ? config.checkedOpt : "";
+    this.optCheckMarker =
+      config && config.optCheckMarker ? config.optCheckMarker : "";
     this.len = menuArr.length;
     this.optPos = 1;
     this.menuStr = "";
@@ -48,13 +62,23 @@ export class Menu {
     this.menuStr = this.menuArr.reduce((acc, opt, i) => {
       let fontWeight = getFontStyle({ mode: "dim" });
       let optId = "  ";
+      let optCheckMarker = "";
       if (i === this.optIndex) {
         optId = "> ";
         fontWeight = getFontStyle() + getFontStyle({ mode: "underline" });
       }
+      if (opt.toLowerCase() === this.checkedOpt.toLowerCase()) {
+        fontWeight += getFontStyle({ mode: "underline" });
+      }
 
       acc +=
-        optId + fontWeight + opt + styleUnderlineReset + fontStyleReset + "\n";
+        optId +
+        fontWeight +
+        opt +
+        styleUnderlineReset +
+        fontStyleReset +
+        optCheckMarker +
+        "\n";
       return acc;
     }, "");
   }
