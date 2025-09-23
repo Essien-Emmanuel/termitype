@@ -89,6 +89,7 @@ export class GameLevel extends Scene {
         const user: User = JSON.parse(userStr);
         user.level = lowerCasedOpt as UserLevel;
         user.stat = statInit;
+        user.improved = false;
         await saveUser(user);
       }
       return { nextScene: "gameLevel" };

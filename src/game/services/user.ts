@@ -9,6 +9,7 @@ export async function saveUser(user?: User) {
     savedUser = {
       name: "Typist",
       level: "beginner",
+      improved: false,
       stat: statInit,
     };
   }

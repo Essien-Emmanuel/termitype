@@ -8,6 +8,7 @@ import { readFile, writeFile } from "@/core/io";
 import { styleFont, styleFontReset } from "@/renderer/font";
 import type { InputKey, WordMapReturnType } from "@/@types";
 import { Input } from "@/core/input";
+import { generateRandomIndex } from "@/core/utils";
 
 const __dirname = import.meta.dirname;
 
@@ -46,14 +47,34 @@ export async function writeToFile(filename: string, data: Record<string, any>) {
   }
 }
 
-export function showStats(playerStat: PlayerStat) {
+export function showStats(playerStat: PlayerStat & { improved: boolean }) {
   const { wpm, accuracy, timeout, mistakes } = playerStat;
   const timeoutInmin = timeout / 1000;
-  console.log("Result");
+
+  console.log(styleFont({ font: "Result", mode: "bold" }) + styleFontReset);
   console.log("speed: " + wpm + "wpm");
   console.log("accuracy: " + Math.round(accuracy) + "%");
   console.log("time: " + Math.round(timeoutInmin) + "s");
   console.log("mistakes: " + mistakes);
+
+  const suggestions = [
+    "Keep your accuracy in check",
+    "Practice more, slow progress is still progress",
+    "Daily practice improves speed and accuracy",
+    "Keep going",
+    "Gambare! Gambare!",
+  ];
+
+  const randInd = generateRandomIndex(suggestions.length);
+  let quote = styleFont({ font: suggestions[randInd], color: "yellow" });
+
+  if (playerStat.improved) {
+    quote = styleFont({
+      font: "You scored a new typing record",
+      color: "green",
+    });
+  }
+  console.log(quote + styleFontReset);
 }
 
 export function matchKeypressToTextPromt(
