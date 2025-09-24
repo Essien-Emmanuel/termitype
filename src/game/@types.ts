@@ -19,3 +19,12 @@ export type ApplyTextStyleConfig = {
   styleFn: (config: StyleFontConfig) => string;
   styleFnConfig: Pick<StyleFontConfig, "color" | "mode">;
 };
+
+export type UserLevel = "beginner" | "intermediate" | "advance" | "master";
+
+export type User = {
+  name: string;
+  improved: boolean;
+  level: UserLevel;
+  stat: PlayerStat;
+};

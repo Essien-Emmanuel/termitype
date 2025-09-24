@@ -40,8 +40,14 @@ export class Engine<T extends string> {
 
     this.sceneManager.currentScene?.render();
 
-    if (result) {
-      this.sceneManager.load(result?.nextScene);
+    if (result && this.sceneManager.currentScene) {
+      if (result.data) {
+        this.sceneManager.load(result?.nextScene, {
+          data: result.data,
+        });
+      } else {
+        this.sceneManager.load(result?.nextScene);
+      }
     }
   }
 

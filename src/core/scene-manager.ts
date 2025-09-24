@@ -1,4 +1,9 @@
-import type { SceneCtor, SceneManagerRegistry, SceneName } from "@/@types";
+import type {
+  SceneCtor,
+  SceneManagerRegistry,
+  SceneName,
+  UpdateSceneReponseData,
+} from "@/@types";
 import type { Scene } from "./scene";
 
 export class SceneManager {
@@ -21,14 +26,18 @@ export class SceneManager {
     return this;
   }
 
-  load(sceneName: SceneName) {
+  load(sceneName: SceneName, config?: { data?: UpdateSceneReponseData }) {
     const isKey = this._registry.has(sceneName);
     if (!isKey) return;
 
     const sceneCtor = this._registry.get(sceneName)!;
     const scene = new sceneCtor();
+    if (config && config.data) {
+      scene.init(config.data?.opt);
+    } else {
+      scene.init();
+    }
 
-    scene.init();
     this.currentScene = scene;
   }
 }

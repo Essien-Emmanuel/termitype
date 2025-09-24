@@ -1,9 +1,23 @@
 import { applyTextStyle, readGameFile } from "./utils.game";
 import { styleFont, styleFontReset } from "@/renderer/font";
 import { positionTerminalCursor, write } from "@/core/io";
+import type { User } from "./@types";
 
-export async function initializeGame(filename: string = "test") {
-  const rawTextPrompt = await readGameFile(`prompts/${filename}.txt`);
+export async function initializeGame(filename: string) {
+  const userStr = await readGameFile("saves/user.json");
+
+  let userLevel = "beginner";
+
+  if (userStr) {
+    const user: User = JSON.parse(userStr);
+    userLevel = user.level;
+  }
+
+  const targetPromptFile = filename
+    ? `prompts/${userLevel}/${filename}/1.txt`
+    : `prompts/${userLevel}/index.txt`;
+
+  const rawTextPrompt = await readGameFile(targetPromptFile);
 
   if (!rawTextPrompt) {
     process.stdout.write(

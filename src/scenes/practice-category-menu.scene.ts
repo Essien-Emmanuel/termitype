@@ -12,43 +12,47 @@ import { Input } from "@/core/input";
 import { Menu } from "@/components";
 import { writeToFile } from "@/game/utils.game";
 import path from "path";
+import {
+  capitalizeString,
+  checkIsDirectory,
+  generateRandomIndex,
+} from "@/core/utils";
 
 const __dirname = import.meta.dirname;
 
 const { isChar, isEnter } = Input;
 
-const fp = path.join(__dirname, "..", "saves/game-state.json");
+export const fp = path.join(__dirname, "..", "prompts/beginner");
 
-export class MainMenuScene extends Scene {
+export class PracticeCategoryMenuScene extends Scene {
   private menu: Menu;
   protected opt: string;
   protected menuStr: string;
   protected selected: boolean;
   protected hasGameState: boolean;
+  protected promptCategory: string[];
 
   constructor() {
     super();
     this.opt = "";
     this.menuStr = "";
     this.selected = false;
+    this.promptCategory = [];
 
     let hasGameState = false;
-    const mainMenu = ["Practice", "Practice Category", "Settings", "Exit"];
+    const menu = ["Random", "Back", "Exit"];
 
-    const fsRead = fs.readFileSync(fp);
-    const gameStateStr = fsRead.toString();
+    const files = fs.readdirSync(fp);
 
-    if (gameStateStr) {
-      const gameState = JSON.parse(gameStateStr);
-      const gameStateLen = Object.keys(gameState).length;
-      if (gameStateLen) {
-        hasGameState = true;
-        mainMenu.unshift("Resume");
-      }
-    }
+    files.map(async (fileName) => {
+      const isDirectory = checkIsDirectory(`${fp}/${fileName}`);
+      if (!isDirectory) return;
+      menu.splice(1, 0, capitalizeString(fileName));
+      this.promptCategory.push(fileName);
+    });
 
     this.hasGameState = Boolean(hasGameState);
-    this.menu = new Menu(mainMenu);
+    this.menu = new Menu(menu);
   }
 
   async init(): Promise<void> {
@@ -70,23 +74,23 @@ export class MainMenuScene extends Scene {
     this.opt = opt;
     this.menuStr = menu;
 
-    if (this.hasGameState) {
-      if (isChar(opt, "Resume") && this.selected) {
-        return { nextScene: "game" };
-      }
-    }
+    const lowerCasedOpt = opt.toLowerCase();
 
-    if (isChar(opt, "Practice Category") && this.selected) {
-      return { nextScene: "practiceCategoryMenu" };
-    }
-
-    if (isChar(opt, "Practice") && this.selected) {
+    if (this.promptCategory.includes(lowerCasedOpt) || isChar(opt, "Random")) {
       await writeToFile("game-state", {});
-      return { nextScene: "game" };
     }
 
-    if (isChar(opt, "Settings") && this.selected) {
-      return { nextScene: "settings" };
+    if (isChar(opt, "Random") && this.selected) {
+      const randInd = generateRandomIndex(this.promptCategory.length);
+      return { nextScene: "game", data: { opt: this.promptCategory[randInd] } };
+    }
+
+    if (this.promptCategory.includes(lowerCasedOpt) && this.selected) {
+      return { nextScene: "game", data: { opt: lowerCasedOpt } };
+    }
+
+    if (isChar(opt, "Back") && this.selected) {
+      return { nextScene: "mainMenu" };
     }
 
     if (isChar(opt, "Exit") && this.selected) {

@@ -1,6 +1,6 @@
-import { readGameFile } from "@/game/utils.game";
+import { readGameFile, writeToFile } from "@/game/utils.game";
 import { showStats } from "@/game/utils.game";
-import type { PlayerStat } from "@/game/@types";
+import type { PlayerStat, User } from "@/game/@types";
 import { clearEntireScreen } from "@/core/io";
 import type { InputKey, UpdateSceneReponse } from "@/@types";
 import { Scene } from "@/core/scene";
@@ -10,22 +10,50 @@ const { isEnter } = Input;
 
 export class ResultScene extends Scene {
   public result: PlayerStat;
+  public improved: boolean;
   constructor() {
     super();
     this.result = { accuracy: 0, mistakes: 0, timeout: 0, wpm: 0 };
+    this.improved = false;
   }
 
   async init() {
     clearEntireScreen();
 
     const dataStr = await readGameFile("saves/result.json");
+    const userStr = await readGameFile("saves/user.json");
 
     if (dataStr) {
       this.result = JSON.parse(dataStr);
     }
 
     const { accuracy, mistakes, timeout, wpm } = this.result;
-    showStats({ accuracy, timeout, mistakes, wpm });
+
+    // check and update new high stat
+    if (userStr) {
+      let user: User = JSON.parse(userStr);
+      const savedStat = user.stat;
+
+      const savedStatValue =
+        savedStat.accuracy +
+        savedStat.wpm -
+        (savedStat.mistakes + savedStat.timeout / 1000);
+
+      const resultValue = accuracy + wpm - (mistakes + timeout / 1000);
+
+      const newHighStat = resultValue > savedStatValue;
+
+      if (newHighStat) {
+        user.stat = this.result;
+        user.improved = true;
+      } else {
+        user.improved = false;
+      }
+      this.improved = user.improved;
+      await writeToFile("user", user);
+    }
+
+    showStats({ accuracy, timeout, mistakes, wpm, improved: this.improved });
   }
 
   async update(key: InputKey): UpdateSceneReponse {

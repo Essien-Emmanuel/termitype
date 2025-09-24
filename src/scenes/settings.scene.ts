@@ -9,35 +9,38 @@ import {
 import { Scene } from "@/core/scene";
 import { Input } from "@/core/input";
 import { Menu } from "@/components";
-import { writeToFile } from "@/game/utils.game";
 
 const { isChar, isEnter } = Input;
 
-const gameMenu = ["Resume", "Practice", "Main Menu", "Exit"] as const;
+const settingsMenu = ["Game Level", "Back", "Exit"] as const;
 
-type GameMenu = (typeof gameMenu)[number] | (string & {});
+type SettingsMenu = (typeof settingsMenu)[number];
 
-export class GameMenuScene extends Scene {
+export class SettingsScene extends Scene {
   private menu: Menu;
-  protected opt: GameMenu;
+  protected opt: string;
   protected menuStr: string;
   protected selected: boolean;
+  protected settingsMenu: readonly SettingsMenu[];
 
   constructor() {
     super();
-    this.menu = new Menu(gameMenu);
     this.opt = "";
     this.menuStr = "";
     this.selected = false;
+    this.settingsMenu = settingsMenu;
+
+    this.menu = new Menu(this.settingsMenu);
   }
 
-  init(): void {
+  async init(): Promise<void> {
     clearEntireScreen();
     setCursorPos();
 
     const { opt, menu } = this.menu.getOpt();
     this.opt = opt;
     this.menuStr = menu;
+
     hideCursor();
     write(menu);
   }
@@ -49,20 +52,15 @@ export class GameMenuScene extends Scene {
     this.opt = opt;
     this.menuStr = menu;
 
-    if (isChar<GameMenu>(opt, "Resume") && this.selected) {
-      return { nextScene: "game" };
+    if (isChar<SettingsMenu>(opt, "Game Level") && this.selected) {
+      return { nextScene: "gameLevel" };
     }
 
-    if (isChar<GameMenu>(opt, "Practice") && this.selected) {
-      await writeToFile("game-state", {});
-      return { nextScene: "game" };
-    }
-
-    if (isChar<GameMenu>(opt, "Main Menu") && this.selected) {
+    if (isChar(opt, "Back") && this.selected) {
       return { nextScene: "mainMenu" };
     }
 
-    if (isChar<GameMenu>(opt, "Exit") && this.selected) {
+    if (isChar(opt, "Exit") && this.selected) {
       clearEntireScreen();
       showCursor();
       process.exit();
