@@ -2,9 +2,9 @@ import fs from "fs";
 import type { InputKey, UpdateSceneReponse } from "@/@types";
 import {
   clearEntireScreen,
+  exitAltTerminal,
   hideCursor,
   setCursorPos,
-  showCursor,
   write,
 } from "@/core/io";
 import { Scene } from "@/core/scene";
@@ -22,7 +22,7 @@ const __dirname = import.meta.dirname;
 
 const { isChar, isEnter } = Input;
 
-export const fp = path.join(__dirname, "..", "prompts/beginner");
+export const fp = path.join(__dirname, "../..", "storage/prompts/beginner");
 
 export class PracticeCategoryMenuScene extends Scene {
   private menu: Menu;
@@ -95,7 +95,7 @@ export class PracticeCategoryMenuScene extends Scene {
 
     if (isChar(opt, "Exit") && this.selected) {
       clearEntireScreen();
-      showCursor();
+      exitAltTerminal();
       process.exit();
     }
 

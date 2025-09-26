@@ -1,6 +1,6 @@
 import { applyTextStyle, readGameFile } from "./utils.game";
 import { styleFont, styleFontReset } from "@/renderer/font";
-import { positionTerminalCursor, write } from "@/core/io";
+import { positionTerminalCursor, setupTerminal, write } from "@/core/io";
 import type { User } from "./@types";
 
 export async function initializeGame(filename: string) {
@@ -46,6 +46,7 @@ export async function initializeGame(filename: string) {
       styleFnConfig: { mode: "dim" },
     }) + styleFontReset;
 
+  setupTerminal();
   write(styledTextPrompt);
   positionTerminalCursor(promptCharPos + 1);
 

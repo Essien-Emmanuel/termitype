@@ -26,7 +26,7 @@ export function applyTextStyle(config: ApplyTextStyleConfig) {
 
 export async function readGameFile(filename: string) {
   try {
-    const fp = path.join(__dirname, "..", `${filename}`);
+    const fp = path.join(__dirname, "../..", `storage/${filename}`);
     const data = await readFile(fp);
     return data;
   } catch (error) {
@@ -37,7 +37,7 @@ export async function readGameFile(filename: string) {
 
 export async function writeToFile(filename: string, data: Record<string, any>) {
   try {
-    const fp = path.join(__dirname, "..", `saves/${filename}.json`);
+    const fp = path.join(__dirname, "../..", `storage/saves/${filename}.json`);
     const result = await writeFile(fp, data);
 
     return result;

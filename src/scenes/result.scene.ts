@@ -1,7 +1,7 @@
 import { readGameFile, writeToFile } from "@/game/utils.game";
 import { showStats } from "@/game/utils.game";
 import type { PlayerStat, User } from "@/game/@types";
-import { clearEntireScreen } from "@/core/io";
+import { clearEntireScreen, exitAltTerminal } from "@/core/io";
 import type { InputKey, UpdateSceneReponse } from "@/@types";
 import { Scene } from "@/core/scene";
 import { Input } from "@/core/input";
@@ -64,6 +64,7 @@ export class ResultScene extends Scene {
   }
 
   render() {
+    exitAltTerminal();
     process.exit();
   }
 }
