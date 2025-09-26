@@ -36,6 +36,16 @@ export function clearEntireScreen() {
   process.stdout.write("\x1b[2J\x1b[3J\x1b[H\n");
 }
 
+export function setupTerminal() {
+  // alternate screen
+  process.stdout.write("\x1b[?1049h");
+}
+export function exitAltTerminal() {
+  // alternate screen
+  process.stdout.write("\x1b[?1049l");
+  showCursor();
+}
+
 export function handleKeypress(handler: HandlekeypressHandler) {
   stdin.removeAllListeners("data");
   stdin.setRawMode(true);

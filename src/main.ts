@@ -1,3 +1,5 @@
+#!/usr/bin/env node
+
 import type { SceneNames } from "./@types";
 import { Engine } from "./core/engine";
 import { GameScene, ResultScene, TitleScene } from "@/scenes";

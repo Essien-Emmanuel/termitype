@@ -1,4 +1,4 @@
-import { hideCursor, showCursor } from "@/core/io";
+import { showCursor } from "@/core/io";
 
 function resetWindowAndLoad(text: string) {
   //   process.stdout.write(

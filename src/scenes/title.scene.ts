@@ -1,6 +1,6 @@
 import type { InputKey, UpdateSceneReponse } from "@/@types";
 import { Scene } from "@/core/scene";
-import { clearEntireScreen } from "@/core/io";
+import { clearEntireScreen, exitAltTerminal } from "@/core/io";
 import { Input } from "@/core/input";
 
 const { isCtrlC } = Input;
@@ -17,6 +17,7 @@ export class TitleScene extends Scene {
 
   async update(key: InputKey): UpdateSceneReponse {
     if (isCtrlC(key)) {
+      exitAltTerminal();
       process.exit();
     }
     return { nextScene: "mainMenu" };

@@ -1,9 +1,9 @@
 import type { InputKey, UpdateSceneReponse } from "@/@types";
 import {
   clearEntireScreen,
+  exitAltTerminal,
   hideCursor,
   setCursorPos,
-  showCursor,
   write,
 } from "@/core/io";
 import { Scene } from "@/core/scene";
@@ -64,7 +64,7 @@ export class GameMenuScene extends Scene {
 
     if (isChar<GameMenu>(opt, "Exit") && this.selected) {
       clearEntireScreen();
-      showCursor();
+      exitAltTerminal();
       process.exit();
     }
 

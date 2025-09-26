@@ -2,9 +2,9 @@ import fs from "fs";
 import type { InputKey, UpdateSceneReponse } from "@/@types";
 import {
   clearEntireScreen,
+  exitAltTerminal,
   hideCursor,
   setCursorPos,
-  showCursor,
   write,
 } from "@/core/io";
 import { Scene } from "@/core/scene";
@@ -17,7 +17,7 @@ const __dirname = import.meta.dirname;
 
 const { isChar, isEnter } = Input;
 
-const fp = path.join(__dirname, "..", "saves/game-state.json");
+const fp = path.join(__dirname, "../..", "storage/saves/game-state.json");
 
 export class MainMenuScene extends Scene {
   private menu: Menu;
@@ -35,16 +35,20 @@ export class MainMenuScene extends Scene {
     let hasGameState = false;
     const mainMenu = ["Practice", "Practice Category", "Settings", "Exit"];
 
-    const fsRead = fs.readFileSync(fp);
-    const gameStateStr = fsRead.toString();
+    try {
+      const fsRead = fs.readFileSync(fp);
+      const gameStateStr = fsRead.toString();
 
-    if (gameStateStr) {
-      const gameState = JSON.parse(gameStateStr);
-      const gameStateLen = Object.keys(gameState).length;
-      if (gameStateLen) {
-        hasGameState = true;
-        mainMenu.unshift("Resume");
+      if (gameStateStr) {
+        const gameState = JSON.parse(gameStateStr);
+        const gameStateLen = Object.keys(gameState).length;
+        if (gameStateLen) {
+          hasGameState = true;
+          mainMenu.unshift("Resume");
+        }
       }
+    } catch (error) {
+      fs.openSync(fp, "w");
     }
 
     this.hasGameState = Boolean(hasGameState);
@@ -91,7 +95,7 @@ export class MainMenuScene extends Scene {
 
     if (isChar(opt, "Exit") && this.selected) {
       clearEntireScreen();
-      showCursor();
+      exitAltTerminal();
       process.exit();
     }
 

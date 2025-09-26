@@ -2,9 +2,9 @@ import fs from "fs";
 import type { InputKey, UpdateSceneReponse } from "@/@types";
 import {
   clearEntireScreen,
+  exitAltTerminal,
   hideCursor,
   setCursorPos,
-  showCursor,
   write,
 } from "@/core/io";
 import { Scene } from "@/core/scene";
@@ -19,10 +19,10 @@ const __dirname = import.meta.dirname;
 
 const { isChar, isEnter } = Input;
 
-export const fp = path.join(__dirname, "..", "prompts");
+export const fp = path.join(__dirname, "../..", "storage/prompts");
 
 export class GameLevel extends Scene {
-  private menu: Menu;
+  private menu!: Menu;
   protected opt: string;
   protected menuStr: string;
   protected selected: boolean;
@@ -40,15 +40,20 @@ export class GameLevel extends Scene {
 
     this.promptCategory = lvlMenu.map((menu) => menu.toLowerCase());
 
-    const fp = path.join(__dirname, "..", "saves/user.json");
-    const userStr = fs.readFileSync(fp);
-    if (userStr) {
-      const user: User = JSON.parse(userStr.toString());
-      this.menu = new Menu(menu, {
-        checkedOpt: user.level,
-        optCheckMarker: "▫️",
-      });
-    } else {
+    const fp = path.join(__dirname, "../..", "storage/saves/user.json");
+    try {
+      const userStr = fs.readFileSync(fp);
+      if (userStr) {
+        const user: User = JSON.parse(userStr.toString());
+        this.menu = new Menu(menu, {
+          checkedOpt: user.level,
+          optCheckMarker: "▫️",
+        });
+      } else {
+        this.menu = new Menu(menu);
+      }
+    } catch (error) {
+      fs.openSync(fp, "w");
       this.menu = new Menu(menu);
     }
   }
@@ -101,7 +106,7 @@ export class GameLevel extends Scene {
 
     if (isChar(opt, "Exit") && this.selected) {
       clearEntireScreen();
-      showCursor();
+      exitAltTerminal();
       process.exit();
     }
 
