@@ -58,13 +58,11 @@ export class ResultScene extends Scene {
 
   async update(key: InputKey): UpdateSceneReponse {
     if (isEnter(key)) {
-      console.log("GameEnds");
+      exitAltTerminal();
+      process.exit();
     }
     return { nextScene: "" };
   }
 
-  render() {
-    exitAltTerminal();
-    process.exit();
-  }
+  render() {}
 }

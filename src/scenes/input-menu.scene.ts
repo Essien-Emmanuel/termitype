@@ -1,13 +1,19 @@
-import { openSync, readFileSync, writeFileSync } from "fs";
 import path from "path";
 import type { InputKey, UpdateSceneReponse } from "@/@types";
 import { Scene } from "@/core/scene";
-import { clearEntireScreen, exitAltTerminal, setCursorPos } from "@/core/io";
+import {
+  clearEntireScreen,
+  exitAltTerminal,
+  hideCursor,
+  setCursorPos,
+  write,
+} from "@/core/io";
 import { Input } from "@/core/input";
 import { Menu } from "@/components";
-import { readGameFile } from "@/game/utils.game";
+import { writeFileSync } from "fs";
+import { writeToFile } from "@/game/utils.game";
 
-const { isCtrlC, isEnter } = Input;
+const { isCtrlC, isChar, isEnter } = Input;
 
 const __dirname = import.meta.dirname;
 
@@ -25,11 +31,19 @@ export function saveAppInitData(data: AppState) {
   return writeFileSync(fp, JSON.stringify(data));
 }
 
-export class TitleScene extends Scene {
+export async function truthifyAppStateSkip() {
+  await writeToFile<AppState>("app-state", {
+    skipUserInput: true,
+    appInitialized: true,
+  });
+}
+
+export class InputMenuScene extends Scene {
   private menu!: Menu;
   protected opt: string;
   protected menuStr: string;
   protected selected: boolean;
+  protected skipUserInput: boolean;
 
   constructor() {
     super();
@@ -37,22 +51,19 @@ export class TitleScene extends Scene {
     this.menuStr = "";
     this.selected = false;
     this.menu = new Menu(titleMenu);
-
-    try {
-      readFileSync(fp);
-    } catch (error) {
-      openSync(fp, "w");
-      saveAppInitData({
-        appInitialized: false,
-        initializedAt: new Date(),
-        skipUserInput: false,
-      });
-    }
+    this.skipUserInput = false;
   }
 
   init() {
     clearEntireScreen();
-    console.log("loading title...");
+    setCursorPos();
+
+    const { opt, menu } = this.menu.getOpt();
+    this.opt = opt;
+    this.menuStr = menu;
+
+    write(this.menuStr);
+    hideCursor();
   }
 
   async update(key: InputKey): UpdateSceneReponse {
@@ -62,11 +73,12 @@ export class TitleScene extends Scene {
     this.opt = opt;
     this.menuStr = menu;
 
-    const appStateStr = await readGameFile("saves/app-state.json");
-    const appState: AppState = JSON.parse(appStateStr!);
-
-    if (!appState.skipUserInput) {
-      return { nextScene: "inputMenu" };
+    if (isChar(this.opt, "Username") && this.selected) {
+      return { nextScene: "userProfile" };
+    }
+    if (isChar(this.opt, "Skip") && this.selected) {
+      truthifyAppStateSkip();
+      return { nextScene: "gameMenu" };
     }
 
     if (isCtrlC(key)) {
@@ -74,11 +86,12 @@ export class TitleScene extends Scene {
       process.exit();
     }
 
-    return { nextScene: "mainMenu" };
+    return { nextScene: "" };
   }
 
   render() {
     clearEntireScreen();
     setCursorPos();
+    write(this.menuStr);
   }
 }

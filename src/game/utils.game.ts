@@ -35,7 +35,15 @@ export async function readGameFile(filename: string) {
   }
 }
 
-export async function writeToFile(filename: string, data: Record<string, any>) {
+/**
+ *
+ * filename param is file name with no extension.
+ * e.g. 'user'
+ */
+export async function writeToFile<T extends Record<string, any>>(
+  filename: string,
+  data: T
+) {
   try {
     const fp = path.join(__dirname, "../..", `storage/saves/${filename}.json`);
     const result = await writeFile(fp, data);
