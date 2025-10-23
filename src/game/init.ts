@@ -1,6 +1,6 @@
 import { applyTextStyle, readGameFile } from "./utils.game";
 import { styleFont, styleFontReset } from "@/renderer/font";
-import { positionTerminalCursor, setupTerminal, write } from "@/core/io";
+import { positionTerminalCursor, write } from "@/core/io";
 import type { User } from "./@types";
 
 export async function initializeGame(filename: string) {
@@ -16,6 +16,8 @@ export async function initializeGame(filename: string) {
   const targetPromptFile = filename
     ? `prompts/${userLevel}/${filename}/1.txt`
     : `prompts/${userLevel}/index.txt`;
+
+  // const targetPromptFile = `prompts/test.txt`;
 
   const rawTextPrompt = await readGameFile(targetPromptFile);
 
@@ -46,9 +48,8 @@ export async function initializeGame(filename: string) {
       styleFnConfig: { mode: "dim" },
     }) + styleFontReset;
 
-  setupTerminal();
-  write(styledTextPrompt);
   positionTerminalCursor(promptCharPos + 1);
+  write(styledTextPrompt);
 
   return {
     textPromptRows,

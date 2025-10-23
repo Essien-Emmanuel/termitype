@@ -5,6 +5,7 @@ import { clearEntireScreen, exitAltTerminal } from "@/core/io";
 import type { InputKey, UpdateSceneReponse } from "@/@types";
 import { Scene } from "@/core/scene";
 import { Input } from "@/core/input";
+import { state } from "@/core/state";
 
 const { isEnter } = Input;
 
@@ -18,6 +19,7 @@ export class ResultScene extends Scene {
   }
 
   async init() {
+    clearInterval(state.timeout);
     clearEntireScreen();
 
     const dataStr = await readGameFile("saves/result.json");
