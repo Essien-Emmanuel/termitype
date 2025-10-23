@@ -36,7 +36,7 @@ export class GameScene extends Scene {
         this.mistakes = 0;
         this.prevTime = 0;
         this.isBackspaceKeypress = false;
-        this.initTimeout = 10000;
+        this.initTimeout = 30000;
         this.timeUsed = 0;
     }
     async _initGameState(filename) {
