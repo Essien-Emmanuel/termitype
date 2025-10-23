@@ -6,14 +6,12 @@ export class Engine<T extends string> {
   private _running: boolean;
   private _key: InputKey;
   public sceneManager: SceneManager;
-  // public timeout: number;
   public timeoutId: NodeJS.Timeout | undefined;
 
   constructor() {
     this.sceneManager = new SceneManager();
     this._running = false;
     this._key = "";
-    // this.timeout = 0;
     this.timeoutId = undefined;
   }
 

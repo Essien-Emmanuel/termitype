@@ -6,6 +6,8 @@ export const sceneNames = [
   "mainMenu",
   "gameLevel",
   "settings",
+  "userProfile",
+  "inputMenu",
   "practiceCategoryMenu",
   "game",
   "gameMenu",

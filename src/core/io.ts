@@ -9,7 +9,7 @@ export function resetTerminalWindow(lines: number = 2) {
   process.stdout.write(`\x1b[${rows};0H\n`);
 }
 export function positionTerminalCursor(cursorPos: number = 1) {
-  process.stdout.write(`\x1b[1;${cursorPos}f`);
+  process.stdout.write(`\x1b[2;${cursorPos}f`);
 }
 
 export function setCursorPos(row: number = 1, col: number = 1) {
@@ -42,6 +42,7 @@ export function setupTerminal() {
 }
 export function exitAltTerminal() {
   // alternate screen
+  clearEntireScreen();
   process.stdout.write("\x1b[?1049l");
   showCursor();
 }

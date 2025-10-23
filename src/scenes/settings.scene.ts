@@ -12,7 +12,7 @@ import { Menu } from "@/components";
 
 const { isChar, isEnter } = Input;
 
-const settingsMenu = ["Game Level", "Back", "Exit"] as const;
+const settingsMenu = ["Username", "Game Level", "Back", "Exit"] as const;
 
 type SettingsMenu = (typeof settingsMenu)[number];
 
@@ -54,6 +54,10 @@ export class SettingsScene extends Scene {
 
     if (isChar<SettingsMenu>(opt, "Game Level") && this.selected) {
       return { nextScene: "gameLevel" };
+    }
+
+    if (isChar<SettingsMenu>(opt, "Username") && this.selected) {
+      return { nextScene: "userProfile" };
     }
 
     if (isChar(opt, "Back") && this.selected) {

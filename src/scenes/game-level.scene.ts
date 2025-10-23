@@ -14,6 +14,8 @@ import { readGameFile, writeToFile } from "@/game/utils.game";
 import path from "path";
 import type { User, UserLevel } from "@/game/@types";
 import { saveUser, statInit } from "@/game/services/user";
+import type { AppState } from "./title.scene";
+import { truthifyAppStateSkip } from "./input-menu.scene";
 
 const __dirname = import.meta.dirname;
 
@@ -81,6 +83,9 @@ export class GameLevel extends Scene {
 
     const lowerCasedOpt = opt.toLowerCase();
 
+    const appStateStr = await readGameFile("saves/app-state.json");
+    const appState: AppState = JSON.parse(appStateStr!);
+
     if (this.promptCategory.includes(lowerCasedOpt)) {
       await writeToFile("game-state", {});
     }
@@ -97,6 +102,12 @@ export class GameLevel extends Scene {
         user.improved = false;
         await saveUser(user);
       }
+
+      if (!appState.skipUserInput) {
+        truthifyAppStateSkip();
+        return { nextScene: "game" };
+      }
+
       return { nextScene: "gameLevel" };
     }
 

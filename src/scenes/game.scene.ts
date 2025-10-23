@@ -5,6 +5,7 @@ import {
   positionTerminalCursor,
   resetTerminalWindow,
   setCursorPos,
+  setupTerminal,
   showCursor,
   write,
 } from "@/core/io";
@@ -19,6 +20,7 @@ import {
   writeToFile,
 } from "@/game/utils.game";
 import { Input } from "@/core/input";
+import { showTimer } from "@/renderer/timer";
 
 const { isBackspace: checkBackspace, isEnter, isChar, isCtrlL } = Input;
 
@@ -52,7 +54,7 @@ export class GameScene extends Scene {
     this.mistakes = 0;
     this.prevTime = 0;
     this.isBackspaceKeypress = false;
-    this.initTimeout = 10000;
+    this.initTimeout = 30000;
     this.timeUsed = 0;
   }
 
@@ -71,7 +73,7 @@ export class GameScene extends Scene {
   }
 
   async init(initArg: string) {
-    clearEntireScreen();
+    setupTerminal();
     // set cursor position
     moveDownBy(1);
 
@@ -79,8 +81,14 @@ export class GameScene extends Scene {
 
     delay();
     clearEntireScreen();
+
     moveDownBy(1);
     showCursor();
+
+    // countdown;
+    showTimer({
+      timeout: this.initTimeout,
+    });
 
     const gameState = await readGameFile("/saves/game-state.json");
 
@@ -114,8 +122,8 @@ export class GameScene extends Scene {
     this.prevTime = 0;
     this.cancelSetTimout = false;
 
-    write(this.styledTextPrompt);
     positionTerminalCursor(this.promptCharPos + 1);
+    write(this.styledTextPrompt);
 
     return;
   }
@@ -213,7 +221,8 @@ export class GameScene extends Scene {
   }
 
   render() {
-    setCursorPos();
+    setCursorPos(2);
+
     write(this.styledTextPrompt);
     positionTerminalCursor(this.promptCharPos + 1);
   }
