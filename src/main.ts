@@ -10,6 +10,7 @@ import { SettingsScene } from "./scenes/settings.scene";
 import { GameLevel } from "./scenes/game-level.scene";
 import { UserProfileScene } from "./scenes/user-profile.scene";
 import { InputMenuScene } from "./scenes/input-menu.scene";
+import { setupTerminal } from "./core/io";
 
 export const engine = new Engine<SceneNames>();
 
@@ -24,5 +25,7 @@ engine.sceneManager
   .register("gameMenu", GameMenuScene)
   .register("practiceCategoryMenu", PracticeCategoryMenuScene)
   .register("result", ResultScene);
+
+setupTerminal();
 
 engine.run("title");

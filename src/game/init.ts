@@ -17,8 +17,6 @@ export async function initializeGame(filename: string) {
     ? `prompts/${userLevel}/${filename}/1.txt`
     : `prompts/${userLevel}/index.txt`;
 
-  // const targetPromptFile = `prompts/test.txt`;
-
   const rawTextPrompt = await readGameFile(targetPromptFile);
 
   if (!rawTextPrompt) {

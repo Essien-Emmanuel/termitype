@@ -42,6 +42,7 @@ export function setupTerminal() {
 }
 export function exitAltTerminal() {
   // alternate screen
+  clearEntireScreen();
   process.stdout.write("\x1b[?1049l");
   showCursor();
 }

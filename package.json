@@ -1,18 +1,19 @@
 {
-  "name": "cli-engine",
-  "version": "1.0.0",
-  "main": "index.js",
+  "name": "termitype",
+  "version": "0.0.1",
+  "main": "./dist/main.js",
   "type": "module",
   "scripts": {
     "game": "tsx ./src/main.ts",
     "build": "tsc && tsc-alias"
   },
   "keywords": [],
-  "author": "",
+  "author": "Essien Emmanuel",
   "license": "ISC",
-  "description": "",
+  "description": "A simple terminal based typing game",
   "bin": {
-    "termitype": "./dist/main.js"
+    "termitype": "./dist/main.js",
+    "typ": "./dist/main.js"
   },
   "devDependencies": {
     "@types/blessed": "^0.1.25",
@@ -23,5 +24,7 @@
   },
   "dependencies": {
     "blessed": "^0.1.81"
-  }
+  },
+  "files": ["dist", "storage"],
+  "repository": {"type": "git", "url": "https://github.com/Essien-Emmanuel/termitype.git"}
 }
