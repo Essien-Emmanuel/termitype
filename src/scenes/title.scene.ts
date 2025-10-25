@@ -6,6 +6,8 @@ import { clearEntireScreen, exitAltTerminal, setCursorPos } from "@/core/io";
 import { Input } from "@/core/input";
 import { Menu } from "@/components";
 import { readGameFile } from "@/game/utils.game";
+import { terminalGameNameArt } from "@/renderer/text";
+import { styleFont, styleFontReset } from "@/renderer/font";
 
 const { isCtrlC, isEnter } = Input;
 
@@ -52,7 +54,10 @@ export class TitleScene extends Scene {
 
   init() {
     clearEntireScreen();
-    console.log("loading title...");
+    console.log(
+      styleFont({ font: terminalGameNameArt, color: "blue", mode: "bold" }) +
+        styleFontReset
+    );
   }
 
   async update(key: InputKey): UpdateSceneReponse {

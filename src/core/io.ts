@@ -1,8 +1,8 @@
-import process from "process";
+import process from "node:process";
 import fs from "fs/promises";
 import type { HandlekeypressHandler } from "@/@types";
 
-const { stdin, stdout } = process;
+const { stdin, stdout, argv, exit } = process;
 
 export function resetTerminalWindow(lines: number = 2) {
   const rows = process.stdout.rows - lines;
@@ -76,4 +76,6 @@ export async function writeFile(filePath: string, data: Record<string, any>) {
   }
 }
 
-export function selectTxtFileFromLocalSys() {}
+export const exitProgram = exit;
+
+export const terminalArgs = argv;

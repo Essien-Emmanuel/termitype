@@ -47,11 +47,13 @@ typ
 
 ### Keyboard Controls
 
-| Key       | Action                |
-|-----------|-----------------------|
-| `Ctrl+C`  | Exit the game         |
-| `Enter`   | Confirm selection     |
-| `Arrow Keys` | Navigate menus    |
+| Key         | Action                        |
+|-------------|-------------------------------|
+| `Ctrl+C`    | Exit the game                 |
+| `Enter`     | Confirm selection             |
+| `Arrow Keys`| Navigate menus                |
+| `Ctrl+S`    | Save current game in game mode|
+| `Ctrl+L`    | Show game menu in game mode   |
 
 ## 🛠️ Development
 
@@ -107,27 +109,6 @@ This project is licensed under the ISC License - see the [LICENSE](LICENSE) file
 
 - GitHub: [@Essien-Emmanuel](https://github.com/Essien-Emmanuel)
 - npm: [termitype](https://www.npmjs.com/package/termitype)
-
-## Keywords
-
-```json
-{
-  "keywords": [
-    "typing",
-    "game",
-    "terminal",
-    "cli",
-    "wpm",
-    "accuracy",
-    "command-line",
-    "nodejs",
-    "typescript",
-    "practice",
-    "console",
-    "terminal-app"
-  ]
-}
-```
 
 ## 🌟 Show your support
 

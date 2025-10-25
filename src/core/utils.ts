@@ -1,4 +1,6 @@
 import fs from "fs";
+import { write } from "./io";
+import { options } from "./option";
 
 export async function delay(ms: number = 3000) {
   await new Promise((resolve) => {
@@ -19,4 +21,16 @@ export function generateRandomIndex(iterLen: number) {
 
 export function capitalizeString(str: string) {
   return str[0].toUpperCase() + str.slice(1).toLowerCase();
+}
+
+export function handleTermninalArgs(opts: string[]) {
+  if (!opts.length) return null;
+
+  for (let opt of opts) {
+    if (["--help", "-h"].includes(opt)) {
+      write(options.help);
+    }
+  }
+
+  return true;
 }
