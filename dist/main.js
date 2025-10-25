@@ -8,18 +8,25 @@ import { SettingsScene } from "./scenes/settings.scene.js";
 import { GameLevel } from "./scenes/game-level.scene.js";
 import { UserProfileScene } from "./scenes/user-profile.scene.js";
 import { InputMenuScene } from "./scenes/input-menu.scene.js";
-import { setupTerminal } from "./core/io.js";
+import { handleTermninalArgs } from "./core/utils.js";
+import { terminalArgs } from "./core/io.js";
 export const engine = new Engine();
-engine.sceneManager
-    .register("title", TitleScene)
-    .register("mainMenu", MainMenuScene)
-    .register("settings", SettingsScene)
-    .register("userProfile", UserProfileScene)
-    .register("inputMenu", InputMenuScene)
-    .register("gameLevel", GameLevel)
-    .register("game", GameScene)
-    .register("gameMenu", GameMenuScene)
-    .register("practiceCategoryMenu", PracticeCategoryMenuScene)
-    .register("result", ResultScene);
-setupTerminal();
-engine.run("title");
+const opts = terminalArgs.slice(2);
+if (!opts.length) {
+    engine.sceneManager
+        .register("title", TitleScene)
+        .register("mainMenu", MainMenuScene)
+        .register("settings", SettingsScene)
+        .register("userProfile", UserProfileScene)
+        .register("inputMenu", InputMenuScene)
+        .register("gameLevel", GameLevel)
+        .register("game", GameScene)
+        .register("gameMenu", GameMenuScene)
+        .register("practiceCategoryMenu", PracticeCategoryMenuScene)
+        .register("result", ResultScene);
+    // setupTerminal();
+    engine.run("title");
+}
+else {
+    handleTermninalArgs(opts);
+}

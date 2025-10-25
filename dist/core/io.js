@@ -1,6 +1,6 @@
-import process from "process";
+import process from "node:process";
 import fs from "fs/promises";
-const { stdin, stdout } = process;
+const { stdin, stdout, argv, exit } = process;
 export function resetTerminalWindow(lines = 2) {
     const rows = process.stdout.rows - lines;
     process.stdout.write(`\x1b[${rows};0H\n`);
@@ -63,4 +63,5 @@ export async function writeFile(filePath, data) {
         return null;
     }
 }
-export function selectTxtFileFromLocalSys() { }
+export const exitProgram = exit;
+export const terminalArgs = argv;
