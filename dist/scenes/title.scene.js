@@ -5,6 +5,8 @@ import { clearEntireScreen, exitAltTerminal, setCursorPos } from "../core/io.js"
 import { Input } from "../core/input.js";
 import { Menu } from "../components/index.js";
 import { readGameFile } from "../game/utils.game.js";
+import { terminalGameNameArt } from "../renderer/text.js";
+import { styleFont, styleFontReset } from "../renderer/font.js";
 const { isCtrlC, isEnter } = Input;
 const __dirname = import.meta.dirname;
 export const fp = path.join(__dirname, "../..", "storage/saves/app-state.json");
@@ -37,7 +39,8 @@ export class TitleScene extends Scene {
     }
     init() {
         clearEntireScreen();
-        console.log("loading title...");
+        console.log(styleFont({ font: terminalGameNameArt, color: "blue", mode: "bold" }) +
+            styleFontReset);
     }
     async update(key) {
         this.selected = isEnter(key) ? true : false;

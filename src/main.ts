@@ -10,22 +10,28 @@ import { SettingsScene } from "./scenes/settings.scene";
 import { GameLevel } from "./scenes/game-level.scene";
 import { UserProfileScene } from "./scenes/user-profile.scene";
 import { InputMenuScene } from "./scenes/input-menu.scene";
-import { setupTerminal } from "./core/io";
+import { handleTermninalArgs } from "./core/utils";
+import { terminalArgs } from "./core/io";
 
 export const engine = new Engine<SceneNames>();
+const opts = terminalArgs.slice(2);
 
-engine.sceneManager
-  .register("title", TitleScene)
-  .register("mainMenu", MainMenuScene)
-  .register("settings", SettingsScene)
-  .register("userProfile", UserProfileScene)
-  .register("inputMenu", InputMenuScene)
-  .register("gameLevel", GameLevel)
-  .register("game", GameScene)
-  .register("gameMenu", GameMenuScene)
-  .register("practiceCategoryMenu", PracticeCategoryMenuScene)
-  .register("result", ResultScene);
+if (!opts.length) {
+  engine.sceneManager
+    .register("title", TitleScene)
+    .register("mainMenu", MainMenuScene)
+    .register("settings", SettingsScene)
+    .register("userProfile", UserProfileScene)
+    .register("inputMenu", InputMenuScene)
+    .register("gameLevel", GameLevel)
+    .register("game", GameScene)
+    .register("gameMenu", GameMenuScene)
+    .register("practiceCategoryMenu", PracticeCategoryMenuScene)
+    .register("result", ResultScene);
 
-setupTerminal();
+  // setupTerminal();
 
-engine.run("title");
+  engine.run("title");
+} else {
+  handleTermninalArgs(opts);
+}

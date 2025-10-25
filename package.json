@@ -1,13 +1,26 @@
 {
   "name": "termitype",
-  "version": "0.0.1",
+  "version": "0.0.3",
   "main": "./dist/main.js",
   "type": "module",
   "scripts": {
     "game": "tsx ./src/main.ts",
     "build": "tsc && tsc-alias"
   },
-  "keywords": [],
+  "keywords": [
+    "typing",
+    "game",
+    "terminal",
+    "cli",
+    "wpm",
+    "accuracy",
+    "nodejs",
+    "typescript",
+    "command-line",
+    "practice",
+    "console",
+    "terminal-app"
+  ],
   "author": "Essien Emmanuel",
   "license": "ISC",
   "description": "A simple terminal based typing game",
@@ -16,15 +29,17 @@
     "typ": "./dist/main.js"
   },
   "devDependencies": {
-    "@types/blessed": "^0.1.25",
     "ts-node": "^10.9.2",
     "tsc-alias": "^1.8.16",
     "tsx": "^4.20.3",
     "typescript": "^5.9.2"
   },
-  "dependencies": {
-    "blessed": "^0.1.81"
-  },
-  "files": ["dist", "storage"],
-  "repository": {"type": "git", "url": "https://github.com/Essien-Emmanuel/termitype.git"}
+  "files": [
+    "dist",
+    "storage"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Essien-Emmanuel/termitype.git"
+  }
 }
